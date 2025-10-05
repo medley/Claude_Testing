@@ -2046,13 +2046,6 @@
                 openSettings();
             }, { passive: false });
 
-            // Speak button
-            const speakBtn = document.querySelector('.speak-button');
-            speakBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                speakWord();
-            }, { passive: false });
-
             // Clear tracing button
             const clearBtn = document.querySelector('.clear-trace-button');
             clearBtn.addEventListener('touchstart', (e) => {
