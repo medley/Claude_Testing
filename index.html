@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welf's Claude Projects</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .welcome {
+            font-size: 1.3rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-card.spelling {
+            border-top: 6px solid #4CAF50;
+        }
+
+        .game-card.jokes {
+            border-top: 6px solid #FF9800;
+        }
+
+        .game-card.halloween {
+            border-top: 6px solid #9C27B0;
+        }
+
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .game-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .game-description {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .play-button {
+            display: inline-block;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+
+        .spelling .play-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        .jokes .play-button {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+
+        .halloween .play-button {
+            background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .welcome {
+                font-size: 1.1rem;
+                padding: 15px;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .game-card {
+                padding: 25px;
+            }
+
+            .icon {
+                font-size: 3rem;
+            }
+
+            .game-title {
+                font-size: 1.5rem;
+            }
+
+            .game-description {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .welcome {
+                font-size: 1rem;
+            }
+
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Welf's Claude Projects 🎮</h1>
+            <div class="welcome">
+                Welcome! Choose a game below and have fun playing! Each game is designed to help you learn while having a great time!
+            </div>
+        </div>
+
+        <div class="games-grid">
+            <!-- Spelling Game Card -->
+            <div class="game-card spelling">
+                <span class="icon">📝</span>
+                <h2 class="game-title">Spelling Game</h2>
+                <p class="game-description">
+                    Practice your spelling skills with fun words! Listen, spell, and become a spelling champion!
+                </p>
+                <a href="spelling-game.html" class="play-button">Play Now</a>
+            </div>
+
+            <!-- Knock Knock Jokes Card -->
+            <div class="game-card jokes">
+                <span class="icon">😂</span>
+                <h2 class="game-title">Knock Knock Jokes</h2>
+                <p class="game-description">
+                    Get ready to laugh! Enjoy hilarious knock knock jokes that will make you giggle!
+                </p>
+                <a href="knock-knock-jokes.html" class="play-button">Play Now</a>
+            </div>
+
+            <!-- Halloween Math Game Card -->
+            <div class="game-card halloween">
+                <span class="icon">🎃</span>
+                <h2 class="game-title">Halloween Math Game</h2>
+                <p class="game-description">
+                    Solve spooky math problems and collect treats! Math has never been this fun and frightful!
+                </p>
+                <a href="halloween-math-game.html" class="play-button">Play Now</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
