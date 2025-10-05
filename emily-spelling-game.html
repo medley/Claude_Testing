@@ -572,6 +572,86 @@
         .spinning {
             animation: spinAnimation 3s ease-in-out;
         }
+
+        /* On-screen keyboard */
+        .on-screen-keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 30px auto;
+            max-width: 800px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .key-button {
+            min-width: 60px;
+            min-height: 60px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            border: 3px solid #ffd1dc;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #ffd1dc, #ffb3d9);
+            color: #ff1493;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .key-button:active {
+            transform: scale(0.95);
+            background: linear-gradient(135deg, #ffb3d9, #ff69b4);
+        }
+
+        .key-button.backspace {
+            background: linear-gradient(135deg, #e0b0ff, #d8a0ff);
+            color: #8b4789;
+            border-color: #e0b0ff;
+            min-width: 100px;
+        }
+
+        @keyframes keyPress {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .key-button.pressed {
+            animation: keyPress 0.3s ease;
+        }
+
+        /* iPad Safari touch fixes */
+        button, .mode-button, .speak-button, .check-button, .clear-trace-button,
+        .save-button, .close-button, .settings-button, .home-button, .key-button {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        @media (max-width: 768px) {
+            .key-button {
+                min-width: 45px;
+                min-height: 45px;
+                font-size: 1.5rem;
+            }
+
+            .keyboard-row {
+                gap: 5px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -626,7 +706,45 @@
                     id="spellingInput"
                     placeholder="Type the word here..."
                     autocomplete="off"
+                    readonly
                 />
+            </div>
+
+            <!-- On-screen keyboard -->
+            <div class="on-screen-keyboard" id="onScreenKeyboard">
+                <div class="keyboard-row">
+                    <button class="key-button" data-key="Q">Q</button>
+                    <button class="key-button" data-key="W">W</button>
+                    <button class="key-button" data-key="E">E</button>
+                    <button class="key-button" data-key="R">R</button>
+                    <button class="key-button" data-key="T">T</button>
+                    <button class="key-button" data-key="Y">Y</button>
+                    <button class="key-button" data-key="U">U</button>
+                    <button class="key-button" data-key="I">I</button>
+                    <button class="key-button" data-key="O">O</button>
+                    <button class="key-button" data-key="P">P</button>
+                </div>
+                <div class="keyboard-row">
+                    <button class="key-button" data-key="A">A</button>
+                    <button class="key-button" data-key="S">S</button>
+                    <button class="key-button" data-key="D">D</button>
+                    <button class="key-button" data-key="F">F</button>
+                    <button class="key-button" data-key="G">G</button>
+                    <button class="key-button" data-key="H">H</button>
+                    <button class="key-button" data-key="J">J</button>
+                    <button class="key-button" data-key="K">K</button>
+                    <button class="key-button" data-key="L">L</button>
+                </div>
+                <div class="keyboard-row">
+                    <button class="key-button" data-key="Z">Z</button>
+                    <button class="key-button" data-key="X">X</button>
+                    <button class="key-button" data-key="C">C</button>
+                    <button class="key-button" data-key="V">V</button>
+                    <button class="key-button" data-key="B">B</button>
+                    <button class="key-button" data-key="N">N</button>
+                    <button class="key-button" data-key="M">M</button>
+                    <button class="key-button backspace" data-key="BACKSPACE">⌫</button>
+                </div>
             </div>
 
             <button class="check-button" id="checkButton" onclick="checkSpelling()">
@@ -1360,6 +1478,11 @@
                 inputArea.style.display = 'none';
                 checkButton.textContent = '🎭 I Did the Action!';
                 checkButton.onclick = actionComplete;
+                // Add touch event for iPad
+                checkButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    actionComplete();
+                }, { passive: false, once: true });
                 document.getElementById('letterBoxes').innerHTML = '';
 
                 // Speak the action cue
@@ -1380,6 +1503,11 @@
                 document.getElementById('spellingInput').value = '';
                 checkButton.textContent = '✅ Check My Spelling!';
                 checkButton.onclick = checkSpelling;
+                // Add touch event for iPad
+                checkButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    checkSpelling();
+                }, { passive: false, once: true });
 
                 // Create letter boxes (only in study mode and sight words mode)
                 if (currentMode === 'test') {
@@ -1410,6 +1538,9 @@
                     animalSVG.classList.add('spinning');
                 }, 100);
             }
+
+            // Update keyboard visibility
+            updateKeyboardVisibility();
         }
 
         // Display animal based on word
@@ -1521,9 +1652,15 @@
                 masteredWords++;
 
                 // Change button to next
-                document.getElementById('checkButton').textContent = '➡️ Next Word!';
-                document.getElementById('checkButton').classList.add('next-button');
-                document.getElementById('checkButton').onclick = nextWord;
+                const nextBtn = document.getElementById('checkButton');
+                nextBtn.textContent = '➡️ Next Word!';
+                nextBtn.classList.add('next-button');
+                nextBtn.onclick = nextWord;
+                // Add touch event for iPad
+                nextBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    nextWord();
+                }, { passive: false, once: true });
 
                 // Auto-advance after 2 seconds
                 setTimeout(() => {
@@ -1862,8 +1999,85 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
+        // On-screen keyboard functionality
+        function setupOnScreenKeyboard() {
+            const keyButtons = document.querySelectorAll('.key-button');
+            const spellingInput = document.getElementById('spellingInput');
+
+            keyButtons.forEach(button => {
+                // Add both click and touchstart for iPad compatibility
+                const handleKeyPress = (e) => {
+                    e.preventDefault();
+                    const key = button.getAttribute('data-key');
+
+                    // Add pressed animation
+                    button.classList.add('pressed');
+                    setTimeout(() => button.classList.remove('pressed'), 300);
+
+                    if (key === 'BACKSPACE') {
+                        spellingInput.value = spellingInput.value.slice(0, -1);
+                    } else {
+                        spellingInput.value += key;
+                    }
+                };
+
+                button.addEventListener('click', handleKeyPress);
+                button.addEventListener('touchstart', handleKeyPress, { passive: false });
+            });
+        }
+
+        // Update startNewWord to show/hide keyboard
+        function updateKeyboardVisibility() {
+            const keyboard = document.getElementById('onScreenKeyboard');
+
+            if (currentMode === 'action') {
+                keyboard.style.display = 'none';
+            } else {
+                keyboard.style.display = 'flex';
+            }
+        }
+
+        // Add touch event listeners to all interactive buttons
+        function setupTouchEvents() {
+            // Settings button
+            const settingsBtn = document.querySelector('.settings-button');
+            settingsBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                openSettings();
+            }, { passive: false });
+
+            // Speak button
+            const speakBtn = document.querySelector('.speak-button');
+            speakBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                speakWord();
+            }, { passive: false });
+
+            // Clear tracing button
+            const clearBtn = document.querySelector('.clear-trace-button');
+            clearBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                clearTracing();
+            }, { passive: false });
+
+            // Mode buttons
+            document.querySelectorAll('.mode-button').forEach(btn => {
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    const mode = btn.classList.contains('study') ? 'study' :
+                                btn.classList.contains('test') ? 'test' :
+                                btn.classList.contains('action') ? 'action' : 'sight';
+                    setMode(mode);
+                }, { passive: false });
+            });
+        }
+
         // Initialize on load
-        window.onload = init;
+        window.onload = () => {
+            init();
+            setupOnScreenKeyboard();
+            setupTouchEvents();
+        };
     </script>
 </body>
 </html>
