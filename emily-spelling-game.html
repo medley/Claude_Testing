@@ -589,7 +589,7 @@
                     ✨ Trace the letters with your finger! ✨
                 </p>
                 <canvas id="tracingCanvas" class="tracing-canvas" width="600" height="200"></canvas>
-                <button class="clear-trace-button" onclick="clearTracing()">Clear & Try Again</button>
+                <button class="clear-trace-button" onclick="clearTracing()">🧹 Clear & Try Again</button>
             </div>
 
             <div class="letter-boxes" id="letterBoxes"></div>
@@ -605,7 +605,7 @@
             </div>
 
             <button class="check-button" id="checkButton" onclick="checkSpelling()">
-                Check My Spelling! ✨
+                ✅ Check My Spelling!
             </button>
         </div>
     </div>
@@ -624,7 +624,7 @@
             <div id="wordInputs"></div>
             <div style="text-align: center; margin-top: 20px;">
                 <button class="save-button" onclick="saveSettings()">💾 Save Words</button>
-                <button class="close-button" onclick="closeSettings()">Cancel</button>
+                <button class="close-button" onclick="closeSettings()">❌ Cancel</button>
             </div>
         </div>
     </div>
@@ -1333,7 +1333,7 @@
                 // Hide input/tracing in action mode
                 tracingArea.style.display = 'none';
                 inputArea.style.display = 'none';
-                checkButton.textContent = 'I Did the Action! 🎭';
+                checkButton.textContent = '🎭 I Did the Action!';
                 checkButton.onclick = actionComplete;
                 document.getElementById('letterBoxes').innerHTML = '';
 
@@ -1353,7 +1353,7 @@
                 }
 
                 document.getElementById('spellingInput').value = '';
-                checkButton.textContent = 'Check My Spelling! ✨';
+                checkButton.textContent = '✅ Check My Spelling!';
                 checkButton.onclick = checkSpelling;
 
                 // Create letter boxes (only in study mode and sight words mode)
@@ -1476,7 +1476,7 @@
                 masteredWords++;
 
                 // Change button to next
-                document.getElementById('checkButton').textContent = 'Next Word! 🌸';
+                document.getElementById('checkButton').textContent = '➡️ Next Word!';
                 document.getElementById('checkButton').classList.add('next-button');
                 document.getElementById('checkButton').onclick = nextWord;
 
