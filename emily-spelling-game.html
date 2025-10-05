@@ -1567,32 +1567,22 @@
         // Text-to-speech
         function speakWord() {
             if ('speechSynthesis' in window) {
-                // If in action mode, speak the full action instruction
-                if (currentMode === 'action') {
-                    const actionCue = actionCues[currentWord.toLowerCase()];
-                    if (actionCue) {
-                        const wordUtterance = new SpeechSynthesisUtterance(currentWord);
-                        wordUtterance.rate = 0.8;
-                        wordUtterance.pitch = 1.2;
-                        speechSynthesis.cancel();
-                        speechSynthesis.speak(wordUtterance);
+                speechSynthesis.cancel();
 
-                        setTimeout(() => {
-                            const actionUtterance = new SpeechSynthesisUtterance(actionCue.audio);
-                            actionUtterance.rate = 0.9;
-                            actionUtterance.pitch = 1.1;
-                            speechSynthesis.speak(actionUtterance);
-                        }, 1500);
-                    }
-                } else {
-                    // Normal word pronunciation for other modes
-                    const utterance = new SpeechSynthesisUtterance(currentWord);
-                    utterance.rate = 0.8;
-                    utterance.pitch = 1.2;
-                    utterance.volume = 1;
-                    speechSynthesis.cancel();
-                    speechSynthesis.speak(utterance);
-                }
+                // Spell out the word letter by letter
+                const letters = currentWord.toUpperCase().split('');
+                let delay = 0;
+
+                letters.forEach((letter, index) => {
+                    setTimeout(() => {
+                        const letterUtterance = new SpeechSynthesisUtterance(letter);
+                        letterUtterance.rate = 0.8;
+                        letterUtterance.pitch = 1.2;
+                        letterUtterance.volume = 1;
+                        speechSynthesis.speak(letterUtterance);
+                    }, delay);
+                    delay += 600; // 600ms pause between letters
+                });
 
                 createSparkles(document.querySelector('.speak-button'));
             }
@@ -1603,20 +1593,28 @@
             if ('speechSynthesis' in window) {
                 const actionCue = actionCues[currentWord.toLowerCase()];
                 if (actionCue) {
-                    // First say the word
-                    const wordUtterance = new SpeechSynthesisUtterance(currentWord);
-                    wordUtterance.rate = 0.8;
-                    wordUtterance.pitch = 1.2;
                     speechSynthesis.cancel();
-                    speechSynthesis.speak(wordUtterance);
 
-                    // Then say the action instruction
-                    setTimeout(() => {
-                        const actionUtterance = new SpeechSynthesisUtterance(actionCue.audio);
-                        actionUtterance.rate = 0.9;
-                        actionUtterance.pitch = 1.1;
-                        speechSynthesis.speak(actionUtterance);
-                    }, 1500);
+                    // First say the action instruction
+                    const actionUtterance = new SpeechSynthesisUtterance(actionCue.audio);
+                    actionUtterance.rate = 0.9;
+                    actionUtterance.pitch = 1.1;
+                    speechSynthesis.speak(actionUtterance);
+
+                    // Then spell out the word letter by letter
+                    const letters = currentWord.toUpperCase().split('');
+                    let delay = 2500; // Wait for action instruction to finish
+
+                    letters.forEach((letter, index) => {
+                        setTimeout(() => {
+                            const letterUtterance = new SpeechSynthesisUtterance(letter);
+                            letterUtterance.rate = 0.8;
+                            letterUtterance.pitch = 1.2;
+                            letterUtterance.volume = 1;
+                            speechSynthesis.speak(letterUtterance);
+                        }, delay);
+                        delay += 600; // 600ms pause between letters
+                    });
                 }
             }
         }
