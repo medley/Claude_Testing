@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚪 Knock Knock Jokes for Kids! 😄</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .container {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        h1 {
+            color: #ff6b9d;
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .joke-stage {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 20px;
+            padding: 40px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .character {
+            font-size: 8em;
+            margin-bottom: 20px;
+            animation: bounce 1s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .character:hover {
+            animation: wiggle 0.5s ease-in-out infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        .door {
+            font-size: 8em;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .door.open {
+            transform: rotateY(90deg);
+            opacity: 0;
+        }
+
+        .speech-bubble {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 80%;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-size: 1.8em;
+            text-align: center;
+            color: #333;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 20px solid white;
+        }
+
+        .interruption {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 15em;
+            z-index: 1000;
+            animation: interrupt 0.8s ease-out forwards;
+        }
+
+        @keyframes interrupt {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .interrupt-text {
+            position: fixed;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4em;
+            color: #ff6b9d;
+            font-weight: bold;
+            z-index: 1001;
+            animation: shake 0.5s;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(-50%) rotate(0deg); }
+            25% { transform: translateX(-50%) rotate(-5deg); }
+            75% { transform: translateX(-50%) rotate(5deg); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 20px 40px;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #333;
+        }
+
+        .joke-counter {
+            text-align: center;
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .star {
+            position: absolute;
+            font-size: 2em;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes doorKnock {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .knocking {
+            animation: doorKnock 0.3s ease-in-out 3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚪 Knock Knock Jokes! 😄</h1>
+
+        <div class="joke-counter" id="jokeCounter">Joke 1 of 10</div>
+
+        <div class="joke-stage" id="jokeStage">
+            <div class="door" id="door" onclick="knockDoor()">🚪</div>
+            <div class="speech-bubble hidden" id="speechBubble"></div>
+            <div class="character hidden" id="character">😄</div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="actionBtn" onclick="nextStep()">Knock Knock! 🚪</button>
+            <button class="btn btn-secondary" onclick="nextJoke()">Next Joke →</button>
+            <button class="btn btn-success" onclick="randomJoke()">🎲 Random Joke</button>
+        </div>
+    </div>
+
+    <div class="stars" id="stars"></div>
+
+    <script>
+        const jokes = [
+            {
+                character: '🐄',
+                setup: 'Interrupting cow',
+                punchline: 'Interrupting cow wh-',
+                interruption: 'MOOO!!!',
+                interruptMid: true
+            },
+            {
+                character: '🍌',
+                setup: 'Banana',
+                response: 'Banana who?',
+                punchline: 'Knock knock!',
+                followup: 'Orange who?',
+                finalPunchline: 'Orange you glad I didn\'t say banana?'
+            },
+            {
+                character: '🦉',
+                setup: 'Owl',
+                response: 'Owl who?',
+                punchline: 'Yes, they do!'
+            },
+            {
+                character: '🥬',
+                setup: 'Lettuce',
+                response: 'Lettuce who?',
+                punchline: 'Lettuce in, it\'s cold out here!'
+            },
+            {
+                character: '🐝',
+                setup: 'Boo',
+                response: 'Boo who?',
+                punchline: 'Don\'t cry, it\'s just a joke!'
+            },
+            {
+                character: '🎵',
+                setup: 'Little old lady',
+                response: 'Little old lady who?',
+                punchline: 'I didn\'t know you could yodel!'
+            },
+            {
+                character: '🐮',
+                setup: 'Cows go',
+                response: 'Cows go who?',
+                punchline: 'No silly, cows go MOO!'
+            },
+            {
+                character: '🧈',
+                setup: 'Butter',
+                response: 'Butter who?',
+                punchline: 'Butter let me in, I\'m getting cold!'
+            },
+            {
+                character: '🍯',
+                setup: 'Honey bee',
+                response: 'Honey bee who?',
+                punchline: 'Honey bee a dear and get me some juice!'
+            },
+            {
+                character: '🦖',
+                setup: 'Tyrannosaurus Rex',
+                response: 'Tyrannosaurus Rex who?',
+                punchline: 'Tyrannosaurus WRECKS everything!'
+            }
+        ];
+
+        let currentJokeIndex = 0;
+        let currentStep = 0;
+        let jokeSequence = [];
+
+        function initJoke() {
+            const joke = jokes[currentJokeIndex];
+            currentStep = 0;
+            document.getElementById('character').textContent = joke.character;
+            document.getElementById('character').classList.add('hidden');
+            document.getElementById('door').classList.remove('open');
+            document.getElementById('door').classList.remove('hidden');
+            document.getElementById('speechBubble').classList.add('hidden');
+            document.getElementById('actionBtn').textContent = 'Knock Knock! 🚪';
+            document.getElementById('jokeCounter').textContent = `Joke ${currentJokeIndex + 1} of ${jokes.length}`;
+
+            // Build joke sequence
+            jokeSequence = [
+                { speaker: 'other', text: 'Knock knock!', audio: 'Knock knock!' },
+                { speaker: 'you', text: 'Who\'s there?', audio: 'Who\'s there?' }
+            ];
+
+            if (joke.interruptMid) {
+                jokeSequence.push(
+                    { speaker: 'other', text: joke.setup, audio: joke.setup },
+                    { speaker: 'you', text: joke.response || `${joke.setup} who?`, audio: `${joke.setup} who?`, interrupt: true }
+                );
+            } else if (joke.followup) {
+                jokeSequence.push(
+                    { speaker: 'other', text: joke.setup, audio: joke.setup },
+                    { speaker: 'you', text: joke.response, audio: joke.response },
+                    { speaker: 'other', text: joke.punchline, audio: joke.punchline },
+                    { speaker: 'you', text: 'Who\'s there?', audio: 'Who\'s there?' },
+                    { speaker: 'other', text: 'Orange', audio: 'Orange' },
+                    { speaker: 'you', text: joke.followup, audio: joke.followup },
+                    { speaker: 'other', text: joke.finalPunchline, audio: joke.finalPunchline }
+                );
+            } else {
+                jokeSequence.push(
+                    { speaker: 'other', text: joke.setup, audio: joke.setup },
+                    { speaker: 'you', text: joke.response, audio: joke.response },
+                    { speaker: 'other', text: joke.punchline, audio: joke.punchline }
+                );
+            }
+        }
+
+        function knockDoor() {
+            const door = document.getElementById('door');
+            door.classList.add('knocking');
+            playKnockSound();
+            setTimeout(() => door.classList.remove('knocking'), 900);
+        }
+
+        function nextStep() {
+            if (currentStep >= jokeSequence.length) {
+                return;
+            }
+
+            const step = jokeSequence[currentStep];
+            const joke = jokes[currentJokeIndex];
+
+            // Open door on first step
+            if (currentStep === 0) {
+                knockDoor();
+                setTimeout(() => {
+                    document.getElementById('door').classList.add('open');
+                    setTimeout(() => {
+                        document.getElementById('door').classList.add('hidden');
+                        document.getElementById('character').classList.remove('hidden');
+                        showSpeechBubble(step.text, step.speaker);
+                        speak(step.audio);
+                    }, 300);
+                }, 1000);
+            } else {
+                // Handle interrupting cow
+                if (joke.interruptMid && step.interrupt) {
+                    // Show the "who" question but interrupt it
+                    showSpeechBubble(step.text, step.speaker);
+                    speak(step.audio.split(' wh-')[0]); // Say "Interrupting cow" first
+
+                    setTimeout(() => {
+                        // Interrupt with MOO
+                        const interruptEmoji = document.createElement('div');
+                        interruptEmoji.className = 'interruption';
+                        interruptEmoji.textContent = joke.character;
+                        document.body.appendChild(interruptEmoji);
+
+                        const interruptText = document.createElement('div');
+                        interruptText.className = 'interrupt-text';
+                        interruptText.textContent = joke.interruption;
+                        document.body.appendChild(interruptText);
+
+                        speak(joke.interruption);
+                        createStars();
+
+                        setTimeout(() => {
+                            interruptEmoji.remove();
+                            interruptText.remove();
+                            showSpeechBubble(joke.interruption, 'other');
+                        }, 1500);
+                    }, 1500);
+                } else {
+                    showSpeechBubble(step.text, step.speaker);
+                    speak(step.audio);
+                }
+            }
+
+            currentStep++;
+
+            // Update button text
+            if (currentStep < jokeSequence.length) {
+                const nextStep = jokeSequence[currentStep];
+                if (nextStep.speaker === 'you') {
+                    document.getElementById('actionBtn').textContent = nextStep.text;
+                } else {
+                    document.getElementById('actionBtn').textContent = 'Continue →';
+                }
+            } else {
+                document.getElementById('actionBtn').textContent = '😄 Ha Ha Ha!';
+                createStars();
+            }
+        }
+
+        function showSpeechBubble(text, speaker) {
+            const bubble = document.getElementById('speechBubble');
+            bubble.textContent = text;
+            bubble.classList.remove('hidden');
+
+            // Change bubble color based on speaker
+            if (speaker === 'you') {
+                bubble.style.background = 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)';
+            } else {
+                bubble.style.background = 'white';
+            }
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 1.3;
+                utterance.volume = 1;
+
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function playKnockSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+            // Play three knocks
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.value = 200;
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                }, i * 200);
+            }
+        }
+
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const emojis = ['⭐', '✨', '💫', '🌟', '⚡'];
+
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = Math.random() * 100 + '%';
+                    star.style.animationDelay = Math.random() * 0.5 + 's';
+                    starsContainer.appendChild(star);
+
+                    setTimeout(() => star.remove(), 2000);
+                }, i * 50);
+            }
+        }
+
+        function nextJoke() {
+            currentJokeIndex = (currentJokeIndex + 1) % jokes.length;
+            initJoke();
+        }
+
+        function randomJoke() {
+            const newIndex = Math.floor(Math.random() * jokes.length);
+            currentJokeIndex = newIndex;
+            initJoke();
+        }
+
+        // Initialize first joke
+        initJoke();
+    </script>
+</body>
+</html>
