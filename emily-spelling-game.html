@@ -138,6 +138,30 @@
             transform: rotate(90deg);
         }
 
+        .home-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #ff69b4;
+            border-radius: 25px;
+            padding: 12px 24px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ff69b4;
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .home-button:hover {
+            transform: scale(1.05);
+            background: #ff69b4;
+            color: white;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -552,6 +576,7 @@
 </head>
 <body>
     <button class="settings-button" onclick="openSettings()">⚙️</button>
+    <a href="index.html" class="home-button">🏠 Home</a>
 
     <div class="container">
         <div class="header">
@@ -1411,12 +1436,32 @@
         // Text-to-speech
         function speakWord() {
             if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(currentWord);
-                utterance.rate = 0.8;
-                utterance.pitch = 1.2;
-                utterance.volume = 1;
-                speechSynthesis.cancel();
-                speechSynthesis.speak(utterance);
+                // If in action mode, speak the full action instruction
+                if (currentMode === 'action') {
+                    const actionCue = actionCues[currentWord.toLowerCase()];
+                    if (actionCue) {
+                        const wordUtterance = new SpeechSynthesisUtterance(currentWord);
+                        wordUtterance.rate = 0.8;
+                        wordUtterance.pitch = 1.2;
+                        speechSynthesis.cancel();
+                        speechSynthesis.speak(wordUtterance);
+
+                        setTimeout(() => {
+                            const actionUtterance = new SpeechSynthesisUtterance(actionCue.audio);
+                            actionUtterance.rate = 0.9;
+                            actionUtterance.pitch = 1.1;
+                            speechSynthesis.speak(actionUtterance);
+                        }, 1500);
+                    }
+                } else {
+                    // Normal word pronunciation for other modes
+                    const utterance = new SpeechSynthesisUtterance(currentWord);
+                    utterance.rate = 0.8;
+                    utterance.pitch = 1.2;
+                    utterance.volume = 1;
+                    speechSynthesis.cancel();
+                    speechSynthesis.speak(utterance);
+                }
 
                 createSparkles(document.querySelector('.speak-button'));
             }

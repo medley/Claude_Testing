@@ -252,9 +252,35 @@
         .knocking {
             animation: doorKnock 0.3s ease-in-out 3;
         }
+
+        .home-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #ff6b9d;
+            border-radius: 25px;
+            padding: 12px 24px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ff6b9d;
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .home-button:hover {
+            transform: scale(1.05);
+            background: #ff6b9d;
+            color: white;
+        }
     </style>
 </head>
 <body>
+    <a href="index.html" class="home-button">🏠 Home</a>
+
     <div class="container">
         <h1>🚪 Knock Knock Jokes! 😄</h1>
 
