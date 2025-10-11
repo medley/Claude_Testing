@@ -8,6 +8,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <style>
         * {
@@ -259,6 +260,86 @@
         .close-button {
             background: #ddd;
             color: #666;
+        }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .auth-box {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .auth-box h1 {
+            color: #ff69b4;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .auth-box p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #ffd1dc;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.2s ease;
+        }
+
+        .auth-button:hover {
+            transform: scale(1.05);
+        }
+
+        .auth-button.primary {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+        }
+
+        .auth-button.secondary {
+            background: linear-gradient(135deg, #98e5d5, #7dd3c0);
+            color: white;
+        }
+
+        .auth-link {
+            color: #9c27b0;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.95rem;
+            margin-top: 15px;
+            display: inline-block;
+        }
+
+        .auth-link:hover {
+            color: #7b1fa2;
         }
 
         .game-area {
@@ -686,11 +767,31 @@
     </style>
 </head>
 <body>
-    <button class="settings-button" onclick="openSettings()">⚙️</button>
-    <button class="progress-button" onclick="openProgressDashboard()">📊</button>
-    <a href="index.html" class="home-button">🏠 Home</a>
+    <!-- Authentication Screen -->
+    <div id="authScreen" class="auth-container">
+        <div class="auth-box">
+            <h1>✨ Welcome! ✨</h1>
+            <p id="authSubtext" style="color: #ff69b4; font-weight: bold;">First time here? Create an account below!</p>
 
-    <div class="container">
+            <input type="email" id="authEmail" class="auth-input" placeholder="📧 Email" />
+            <input type="password" id="authPassword" class="auth-input" placeholder="🔒 Password" />
+
+            <button class="auth-button primary" onclick="signIn()">🔑 Log In (Existing Students)</button>
+            <button class="auth-button secondary" onclick="createAccount()">✨ Create New Account</button>
+
+            <div class="auth-link" onclick="forgotPassword()">Forgot Password?</div>
+
+            <div id="authMessage" style="margin-top: 15px; padding: 10px; border-radius: 10px; display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Game Screen (hidden until authenticated) -->
+    <div id="gameScreen" style="display: none;">
+        <button class="settings-button" onclick="openSettings()">⚙️</button>
+        <button class="progress-button" onclick="openProgressDashboard()">📊</button>
+        <a href="index.html" class="home-button">🏠 Home</a>
+
+        <div class="container">
         <div class="header">
             <h1>✨ Emily's Magical Spelling Garden ✨</h1>
         </div>
@@ -797,10 +898,13 @@
                 Customize Emily's weekly spelling words below:
             </p>
             <div id="wordInputs"></div>
+
             <div style="text-align: center; margin-top: 20px;">
                 <button class="save-button" onclick="saveSettings()">💾 Save Words</button>
                 <button class="close-button" onclick="closeSettings()">❌ Cancel</button>
                 <button class="save-button" onclick="resetProgress()" style="background: linear-gradient(135deg, #ff6b6b, #c92a2a); margin-top: 10px;">🔄 Reset Progress</button>
+                <button class="save-button" onclick="logout()" style="background: linear-gradient(135deg, #9c27b0, #7b1fa2); margin-top: 10px;">🚪 Logout</button>
+                <button class="save-button" id="teacherPortalBtn" onclick="checkTeacherAccess()" style="background: linear-gradient(135deg, #4caf50, #45a049); margin-top: 10px; display: none;">👩‍🏫 Teacher Portal</button>
             </div>
         </div>
     </div>
@@ -848,7 +952,332 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const userId = 'emily'; // Single user for now
+        const auth = firebase.auth();
+        let currentUser = null;
+        let userId = null;
+
+        // Google Cloud Text-to-Speech API Configuration
+        const GOOGLE_TTS_API_KEY = 'AIzaSyDsuPomvQilWZtwH7B5-jqe59EVx2u7biI';
+        const GOOGLE_TTS_API_URL = 'https://texttospeech.googleapis.com/v1/text:synthesize';
+        const GOOGLE_VOICE_NAME = 'en-US-Neural2-F'; // High-quality female voice
+
+        // Audio cache to avoid repeated API calls
+        const audioCache = new Map();
+
+        // Google Cloud TTS function (ONLY Google TTS - no browser fallback)
+        async function speakWithGoogleTTS(text, useCache = true) {
+            console.log('🎤 Google TTS called for text:', text);
+
+            // Check cache first
+            if (useCache && audioCache.has(text)) {
+                console.log('✅ Using cached audio for:', text);
+                const cachedAudio = audioCache.get(text);
+                return playAudioFromBase64(cachedAudio);
+            }
+
+            try {
+                // Show subtle loading indicator
+                showSpeechLoading();
+
+                console.log('📡 Calling Google TTS API...');
+                const response = await fetch(`${GOOGLE_TTS_API_URL}?key=${GOOGLE_TTS_API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        input: { text: text },
+                        voice: {
+                            languageCode: 'en-US',
+                            name: GOOGLE_VOICE_NAME,
+                            ssmlGender: 'FEMALE'
+                        },
+                        audioConfig: {
+                            audioEncoding: 'MP3',
+                            pitch: 0.5,        // Slightly higher for kid-friendly tone
+                            speakingRate: 0.85  // Slower for clarity
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Google TTS API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const audioContent = data.audioContent;
+
+                console.log('✅ Google TTS API response received, audio length:', audioContent.length);
+
+                // Cache the audio
+                if (useCache) {
+                    audioCache.set(text, audioContent);
+                    console.log('💾 Cached audio for:', text);
+                }
+
+                hideSpeechLoading();
+                return playAudioFromBase64(audioContent);
+
+            } catch (error) {
+                console.error('❌ Google TTS API failed:', error);
+                hideSpeechLoading();
+                // Show friendly error message instead of fallback
+                showSpeechError();
+                throw error; // Re-throw to prevent execution
+            }
+        }
+
+        // Play audio from base64 string
+        function playAudioFromBase64(base64Audio) {
+            return new Promise((resolve, reject) => {
+                console.log('🔊 Playing audio...');
+                const audio = new Audio('data:audio/mp3;base64,' + base64Audio);
+                audio.onended = () => {
+                    console.log('✅ Audio playback finished');
+                    resolve();
+                };
+                audio.onerror = (err) => {
+                    console.error('❌ Audio playback error:', err);
+                    reject(err);
+                };
+                audio.play().catch(reject);
+            });
+        }
+
+        // Show friendly error when voice is unavailable
+        function showSpeechError() {
+            showEncouragement('🎤 Voice is temporarily unavailable. Please try again in a moment!');
+        }
+
+        // Show/hide loading indicator
+        function showSpeechLoading() {
+            const speakBtn = document.querySelector('.speak-button');
+            if (speakBtn) {
+                speakBtn.style.opacity = '0.6';
+                speakBtn.style.pointerEvents = 'none';
+            }
+        }
+
+        function hideSpeechLoading() {
+            const speakBtn = document.querySelector('.speak-button');
+            if (speakBtn) {
+                speakBtn.style.opacity = '1';
+                speakBtn.style.pointerEvents = 'auto';
+            }
+        }
+
+        // Helper function to show friendly messages
+        function showAuthMessage(message, isError = false) {
+            const msgDiv = document.getElementById('authMessage');
+            msgDiv.style.display = 'block';
+            msgDiv.style.background = isError
+                ? 'linear-gradient(135deg, #ffcdd2, #ef9a9a)'
+                : 'linear-gradient(135deg, #c8e6c9, #a5d6a7)';
+            msgDiv.style.color = isError ? '#c62828' : '#2e7d32';
+            msgDiv.innerHTML = message;
+        }
+
+        function hideAuthMessage() {
+            document.getElementById('authMessage').style.display = 'none';
+        }
+
+        // Authentication Functions
+        async function createAccount() {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value;
+
+            hideAuthMessage();
+
+            if (!email || !password) {
+                showAuthMessage('📝 Please enter both email and password!', true);
+                return;
+            }
+
+            if (password.length < 6) {
+                showAuthMessage('🔒 Password needs to be at least 6 characters long! Make it strong and secure!', true);
+                return;
+            }
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                userId = currentUser.uid;
+                showAuthMessage('🎉 Account created successfully! Welcome to the spelling garden!');
+                setTimeout(() => showGameScreen(), 1500);
+            } catch (error) {
+                console.error('Signup error:', error);
+
+                // Kid-friendly error messages
+                if (error.code === 'auth/email-already-in-use') {
+                    showAuthMessage('💡 This email already has an account! Try logging in with the button above instead. 🔑', true);
+                } else if (error.code === 'auth/invalid-email') {
+                    showAuthMessage('📧 Hmm, that email doesn\'t look quite right. Can you check it again?', true);
+                } else if (error.code === 'auth/weak-password') {
+                    showAuthMessage('🔒 Your password needs to be stronger! Try adding more letters or numbers.', true);
+                } else {
+                    showAuthMessage('😊 Oops! Something went wrong. Please try again or ask a grown-up for help!', true);
+                }
+            }
+        }
+
+        async function signIn() {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value;
+
+            hideAuthMessage();
+
+            if (!email || !password) {
+                showAuthMessage('📝 Please enter both email and password!', true);
+                return;
+            }
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                userId = currentUser.uid;
+
+                showAuthMessage('✨ Welcome back! Loading your spelling garden...');
+
+                // Check if teacher account
+                if (email === 'teacher@emilygame.com') {
+                    setTimeout(() => openTeacherPortal(), 1000);
+                } else {
+                    setTimeout(() => showGameScreen(), 1500);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+
+                // Kid-friendly error messages
+                if (error.code === 'auth/user-not-found') {
+                    showAuthMessage('🔍 We couldn\'t find that account. Try creating a new account with the button below! ✨', true);
+                } else if (error.code === 'auth/wrong-password') {
+                    showAuthMessage('🔑 Oops! That password doesn\'t match. Try again or click "Forgot Password?" below for help.', true);
+                } else if (error.code === 'auth/invalid-email') {
+                    showAuthMessage('📧 Hmm, that email doesn\'t look quite right. Can you check it again?', true);
+                } else if (error.code === 'auth/too-many-requests') {
+                    showAuthMessage('⏰ Too many tries! Please wait a few minutes and try again, or reset your password.', true);
+                } else {
+                    showAuthMessage('😊 Oops! Something went wrong. Please try again or ask a grown-up for help!', true);
+                }
+            }
+        }
+
+        async function forgotPassword() {
+            const email = document.getElementById('authEmail').value.trim();
+
+            hideAuthMessage();
+
+            if (!email) {
+                showAuthMessage('📧 Please enter your email address first so we know where to send the reset link!', true);
+                return;
+            }
+
+            try {
+                await auth.sendPasswordResetEmail(email);
+                showAuthMessage('✉️ Password reset email sent! Check your inbox and follow the link to create a new password. 💌');
+            } catch (error) {
+                console.error('Password reset error:', error);
+
+                // Kid-friendly error messages
+                if (error.code === 'auth/user-not-found') {
+                    showAuthMessage('🔍 We couldn\'t find an account with that email. Try creating a new account instead!', true);
+                } else if (error.code === 'auth/invalid-email') {
+                    showAuthMessage('📧 Hmm, that email doesn\'t look quite right. Can you check it again?', true);
+                } else {
+                    showAuthMessage('😊 Oops! We couldn\'t send the reset email. Please try again or ask a grown-up for help!', true);
+                }
+            }
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                currentUser = null;
+                userId = null;
+                document.getElementById('gameScreen').style.display = 'none';
+                document.getElementById('authScreen').style.display = 'flex';
+                document.getElementById('authEmail').value = '';
+                document.getElementById('authPassword').value = '';
+            });
+        }
+
+        function showGameScreen() {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+
+            // Show teacher portal button if teacher
+            if (currentUser && currentUser.email === 'teacher@emilygame.com') {
+                document.getElementById('teacherPortalBtn').style.display = 'block';
+            }
+
+            init();
+            setupOnScreenKeyboard();
+            setupTouchEvents();
+        }
+
+        // Teacher Portal Functions
+        function checkTeacherAccess() {
+            if (currentUser && currentUser.email === 'teacher@emilygame.com') {
+                openTeacherPortal();
+            } else {
+                alert('Teacher access only!');
+            }
+        }
+
+        async function openTeacherPortal() {
+            try {
+                const teacherContent = document.getElementById('teacherContent');
+                teacherContent.innerHTML = '<p>Loading all students\' progress...</p>';
+
+                document.getElementById('teacherPortal').classList.add('active');
+
+                // Fetch all users' progress from Firestore
+                const snapshot = await db.collection('users').get();
+
+                if (snapshot.empty) {
+                    teacherContent.innerHTML = '<p style="color: #999;">No student data found yet.</p>';
+                    return;
+                }
+
+                let studentsHTML = '<div style="max-height: 500px; overflow-y: auto;">';
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const progress = data.progressData || {};
+                    const studentId = doc.id;
+
+                    // Skip teacher's own account
+                    if (studentId === currentUser.uid) return;
+
+                    const totalMastered = Object.keys(progress.masteredWords || {}).length;
+                    const totalSessions = (progress.sessions || []).length;
+                    const accuracy = progress.totalWordsAttempted > 0
+                        ? Math.round((progress.totalWordsCorrect / progress.totalWordsAttempted) * 100)
+                        : 0;
+                    const flowers = progress.flowerProgress || 0;
+
+                    studentsHTML += `
+                        <div style="background: linear-gradient(135deg, #ffd3f0, #ffe6f7); padding: 15px; border-radius: 15px; margin-bottom: 15px;">
+                            <h3 style="color: #ff69b4; margin-bottom: 10px;">Student: ${studentId.substring(0, 8)}...</h3>
+                            <p><strong>📚 Words Mastered:</strong> ${totalMastered}</p>
+                            <p><strong>📝 Practice Sessions:</strong> ${totalSessions}</p>
+                            <p><strong>✅ Accuracy:</strong> ${accuracy}%</p>
+                            <p><strong>🌸 Flowers Bloomed:</strong> ${flowers}/20</p>
+                        </div>
+                    `;
+                });
+
+                studentsHTML += '</div>';
+                teacherContent.innerHTML = studentsHTML;
+
+            } catch (error) {
+                console.error('Error loading teacher portal:', error);
+                document.getElementById('teacherContent').innerHTML = '<p style="color: red;">Error loading student data.</p>';
+            }
+        }
+
+        function closeTeacherPortal() {
+            document.getElementById('teacherPortal').classList.remove('active');
+        }
 
         // SVG Animal Definitions
         const animals = {
@@ -1725,58 +2154,60 @@
             }
         }
 
-        // Text-to-speech
-        function speakWord() {
-            if ('speechSynthesis' in window) {
-                speechSynthesis.cancel();
+        // Text-to-speech using ONLY Google Cloud TTS
+        async function speakWord() {
+            console.log('🎯 speakWord() called for word:', currentWord);
 
-                // Spell out the word letter by letter
-                const letters = currentWord.toUpperCase().split('');
-                let delay = 0;
+            // Spell out the word letter by letter using Google TTS
+            const letters = currentWord.toUpperCase().split('');
 
-                letters.forEach((letter, index) => {
-                    setTimeout(() => {
-                        const letterUtterance = new SpeechSynthesisUtterance(letter);
-                        letterUtterance.rate = 0.8;
-                        letterUtterance.pitch = 1.2;
-                        letterUtterance.volume = 1;
-                        speechSynthesis.speak(letterUtterance);
-                    }, delay);
-                    delay += 600; // 600ms pause between letters
-                });
+            createSparkles(document.querySelector('.speak-button'));
 
-                createSparkles(document.querySelector('.speak-button'));
+            // Speak each letter sequentially
+            for (let i = 0; i < letters.length; i++) {
+                const letter = letters[i].toLowerCase();
+                try {
+                    await speakWithGoogleTTS(letter, true);
+                    // Small pause between letters (handled naturally by sequential calls)
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                } catch (error) {
+                    console.error('❌ Error speaking letter:', letter, error);
+                    // Stop on error - don't continue spelling
+                    break;
+                }
             }
         }
 
-        // Speak action cue
-        function speakActionCue() {
-            if ('speechSynthesis' in window) {
-                const actionCue = actionCues[currentWord.toLowerCase()];
-                if (actionCue) {
-                    speechSynthesis.cancel();
+        // Speak action cue using ONLY Google Cloud TTS
+        async function speakActionCue() {
+            console.log('🎯 speakActionCue() called for word:', currentWord);
 
-                    // First say the action instruction
-                    const actionUtterance = new SpeechSynthesisUtterance(actionCue.audio);
-                    actionUtterance.rate = 0.9;
-                    actionUtterance.pitch = 1.1;
-                    speechSynthesis.speak(actionUtterance);
+            const actionCue = actionCues[currentWord.toLowerCase()];
+            if (!actionCue) return;
 
-                    // Then spell out the word letter by letter
-                    const letters = currentWord.toUpperCase().split('');
-                    let delay = 2500; // Wait for action instruction to finish
+            try {
+                // First say the action instruction using Google TTS
+                console.log('📢 Speaking action instruction:', actionCue.audio);
+                await speakWithGoogleTTS(actionCue.audio, true);
 
-                    letters.forEach((letter, index) => {
-                        setTimeout(() => {
-                            const letterUtterance = new SpeechSynthesisUtterance(letter);
-                            letterUtterance.rate = 0.8;
-                            letterUtterance.pitch = 1.2;
-                            letterUtterance.volume = 1;
-                            speechSynthesis.speak(letterUtterance);
-                        }, delay);
-                        delay += 600; // 600ms pause between letters
-                    });
+                // Brief pause before spelling
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Then spell out the word letter by letter
+                const letters = currentWord.toUpperCase().split('');
+                for (let i = 0; i < letters.length; i++) {
+                    const letter = letters[i].toLowerCase();
+                    try {
+                        await speakWithGoogleTTS(letter, true);
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    } catch (error) {
+                        console.error('❌ Error speaking letter:', letter, error);
+                        // Stop on error - don't continue spelling
+                        break;
+                    }
                 }
+            } catch (error) {
+                console.error('❌ Error speaking action cue:', error);
             }
         }
 
@@ -2229,9 +2660,26 @@
             const spellingInput = document.getElementById('spellingInput');
 
             keyButtons.forEach(button => {
-                // Add both click and touchstart for iPad compatibility
+                // Remove any existing listeners to prevent duplicates
+                const oldHandler = button._keyPressHandler;
+                if (oldHandler) {
+                    button.removeEventListener('click', oldHandler);
+                    button.removeEventListener('touchstart', oldHandler);
+                }
+
+                // Create handler that prevents both touch and click from firing
+                let touchHandled = false;
                 const handleKeyPress = (e) => {
                     e.preventDefault();
+
+                    // Prevent double-firing on touch devices
+                    if (e.type === 'touchstart') {
+                        touchHandled = true;
+                    } else if (e.type === 'click' && touchHandled) {
+                        touchHandled = false;
+                        return;
+                    }
+
                     const key = button.getAttribute('data-key');
 
                     // Add pressed animation
@@ -2243,7 +2691,13 @@
                     } else {
                         spellingInput.value += key;
                     }
+
+                    // Reset touch flag after a short delay
+                    setTimeout(() => { touchHandled = false; }, 500);
                 };
+
+                // Store handler reference for future cleanup
+                button._keyPressHandler = handleKeyPress;
 
                 button.addEventListener('click', handleKeyPress);
                 button.addEventListener('touchstart', handleKeyPress, { passive: false });
@@ -2296,12 +2750,41 @@
             });
         }
 
-        // Initialize on load
-        window.onload = () => {
-            init();
-            setupOnScreenKeyboard();
-            setupTouchEvents();
-        };
+        // Initialize Firebase Auth listener after DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    currentUser = user;
+                    userId = user.uid;
+                    if (user.email === 'teacher@emilygame.com') {
+                        document.getElementById('authScreen').style.display = 'none';
+                        showGameScreen();
+                    } else {
+                        showGameScreen();
+                    }
+                } else {
+                    // User is not logged in, show auth screen
+                    document.getElementById('authScreen').style.display = 'flex';
+                    document.getElementById('gameScreen').style.display = 'none';
+                }
+            });
+        });
     </script>
+    </div> <!-- End gameScreen -->
+
+    <!-- Teacher Portal Modal -->
+    <div class="modal" id="teacherPortal">
+        <div class="modal-content" style="max-width: 800px;">
+            <h2>👩‍🏫 Teacher Portal</h2>
+            <div id="teacherContent" style="margin: 20px 0;">
+                <p>Loading students' progress...</p>
+            </div>
+            <div style="text-align: center;">
+                <button class="close-button" onclick="closeTeacherPortal()">❌ Close</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
