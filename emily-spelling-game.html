@@ -2892,26 +2892,36 @@
         }
 
         // Text-to-speech using ONLY Google Cloud TTS
+        // Best practice spelling instruction: word → pause → letters → pause → word
         async function speakWord() {
             console.log('🎯 speakWord() called for word:', currentWord);
 
-            // Spell out the word letter by letter using Google TTS
-            const letters = currentWord.toUpperCase().split('');
-
             createSparkles(document.querySelector('.speak-button'));
 
-            // Speak each letter sequentially
-            for (let i = 0; i < letters.length; i++) {
-                const letter = letters[i].toLowerCase();
-                try {
+            try {
+                // Step 1: Say the full word first
+                await speakWithGoogleTTS(currentWord, true);
+
+                // Step 2: Pause 500ms
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Step 3: Spell out letter by letter
+                const letters = currentWord.toUpperCase().split('');
+                for (let i = 0; i < letters.length; i++) {
+                    const letter = letters[i].toLowerCase();
                     await speakWithGoogleTTS(letter, true);
-                    // Small pause between letters (handled naturally by sequential calls)
-                    await new Promise(resolve => setTimeout(resolve, 200));
-                } catch (error) {
-                    console.error('❌ Error speaking letter:', letter, error);
-                    // Stop on error - don't continue spelling
-                    break;
+                    // Pause between letters
+                    await new Promise(resolve => setTimeout(resolve, 300));
                 }
+
+                // Step 4: Pause 800ms
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                // Step 5: Say the full word again
+                await speakWithGoogleTTS(currentWord, true);
+
+            } catch (error) {
+                console.error('❌ Error in speakWord:', error);
             }
         }
 
