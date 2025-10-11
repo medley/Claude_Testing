@@ -1696,7 +1696,7 @@
         // Google Cloud Text-to-Speech API Configuration
         const GOOGLE_TTS_API_KEY = 'AIzaSyDsuPomvQilWZtwH7B5-jqe59EVx2u7biI';
         const GOOGLE_TTS_API_URL = 'https://texttospeech.googleapis.com/v1/text:synthesize';
-        const GOOGLE_VOICE_NAME = 'en-US-Neural2-F'; // High-quality female voice
+        const GOOGLE_VOICE_NAME = 'en-US-Neural2-C'; // Warm, natural-sounding female voice
 
         // Audio cache to avoid repeated API calls
         const audioCache = new Map();
@@ -1731,8 +1731,8 @@
                         },
                         audioConfig: {
                             audioEncoding: 'MP3',
-                            pitch: 0.5,        // Slightly higher for kid-friendly tone
-                            speakingRate: 0.85  // Slower for clarity
+                            pitch: 0,          // Neutral pitch for natural sound
+                            speakingRate: 0.95 // Near-natural speed (slightly slower for clarity)
                         }
                     })
                 });
