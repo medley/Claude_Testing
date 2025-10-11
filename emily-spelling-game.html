@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emily's Magical Spelling Garden</title>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -136,6 +141,25 @@
 
         .settings-button:hover {
             transform: rotate(90deg);
+        }
+
+        .progress-button {
+            position: fixed;
+            top: 20px;
+            right: 100px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #9c27b0;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .progress-button:hover {
+            transform: scale(1.1);
         }
 
         .home-button {
@@ -539,6 +563,13 @@
                 height: 50px;
                 font-size: 1.5rem;
             }
+
+            .progress-button {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+                right: 80px;
+            }
         }
 
         .action-instruction {
@@ -633,7 +664,7 @@
 
         /* iPad Safari touch fixes */
         button, .mode-button, .speak-button, .check-button, .clear-trace-button,
-        .save-button, .close-button, .settings-button, .home-button, .key-button {
+        .save-button, .close-button, .settings-button, .progress-button, .home-button, .key-button {
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
             cursor: pointer;
@@ -656,6 +687,7 @@
 </head>
 <body>
     <button class="settings-button" onclick="openSettings()">⚙️</button>
+    <button class="progress-button" onclick="openProgressDashboard()">📊</button>
     <a href="index.html" class="home-button">🏠 Home</a>
 
     <div class="container">
@@ -768,11 +800,56 @@
             <div style="text-align: center; margin-top: 20px;">
                 <button class="save-button" onclick="saveSettings()">💾 Save Words</button>
                 <button class="close-button" onclick="closeSettings()">❌ Cancel</button>
+                <button class="save-button" onclick="resetProgress()" style="background: linear-gradient(135deg, #ff6b6b, #c92a2a); margin-top: 10px;">🔄 Reset Progress</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Dashboard Modal -->
+    <div class="modal" id="progressModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <h2>📊 Emily's Progress Dashboard</h2>
+            <div id="progressContent" style="margin: 20px 0;">
+                <div style="background: linear-gradient(135deg, #ffd3f0, #ffe6f7); padding: 20px; border-radius: 15px; margin-bottom: 15px;">
+                    <h3 style="margin-bottom: 10px;">📈 Overall Stats</h3>
+                    <p><strong>Total Words Mastered:</strong> <span id="totalMastered">0</span></p>
+                    <p><strong>Total Practice Sessions:</strong> <span id="totalSessions">0</span></p>
+                    <p><strong>Accuracy Rate:</strong> <span id="accuracyRate">0%</span></p>
+                    <p><strong>Flowers Bloomed:</strong> <span id="flowersCount">0</span>/20</p>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #e0f7fa, #f0f9ff); padding: 20px; border-radius: 15px; margin-bottom: 15px;">
+                    <h3 style="margin-bottom: 10px;">🌟 This Week's Stars</h3>
+                    <div id="weeklyWords" style="font-size: 14px;"></div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #c8e6c9, #e8f5e9); padding: 20px; border-radius: 15px;">
+                    <h3 style="margin-bottom: 10px;">🏆 Top Mastered Words</h3>
+                    <div id="topWords" style="font-size: 14px;"></div>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <button class="close-button" onclick="closeProgressDashboard()">❌ Close</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: 'AIzaSyAp3IIerN5CBwln1-PvfX_aDDufvQmhDyM',
+            authDomain: 'kids-app-34d1b.firebaseapp.com',
+            projectId: 'kids-app-34d1b',
+            storageBucket: 'kids-app-34d1b.firebasestorage.app',
+            messagingSenderId: '256010578689',
+            appId: '1:256010578689:web:911644649303631b214900'
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const userId = 'emily'; // Single user for now
+
         // SVG Animal Definitions
         const animals = {
             capybaraPointing: `
@@ -1289,6 +1366,16 @@
         // Default Weekly Words
         let weeklyWords = ['The', 'There', 'spin', 'Grass', 'leg', 'beg', 'head', 'bread', 'men', 'again'];
 
+        // Progress Tracking
+        let progressData = {
+            masteredWords: {}, // {word: {count: number, lastMastered: timestamp, dates: []}}
+            sessions: [], // [{date: timestamp, wordsCorrect: number, wordsTotal: number, mode: string}]
+            totalWordsAttempted: 0,
+            totalWordsCorrect: 0,
+            flowerProgress: 0,
+            startDate: Date.now()
+        };
+
         // Action cues for each word
         const actionCues = {
             'there': {
@@ -1372,6 +1459,79 @@
 
         const defaultAnimals = ['capybara', 'bunny', 'hamster', 'guineaPig', 'axolotl', 'horse'];
 
+        // Firestore Functions
+        async function saveProgress() {
+            try {
+                await db.collection('users').doc(userId).set({
+                    progressData: progressData,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (e) {
+                console.error('Failed to save progress:', e);
+            }
+        }
+
+        async function loadProgress() {
+            try {
+                const doc = await db.collection('users').doc(userId).get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.progressData) {
+                        progressData = data.progressData;
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load progress:', e);
+            }
+        }
+
+        async function recordWordMastered(word) {
+            const wordLower = word.toLowerCase();
+            if (!progressData.masteredWords[wordLower]) {
+                progressData.masteredWords[wordLower] = {
+                    count: 0,
+                    lastMastered: null,
+                    dates: []
+                };
+            }
+            progressData.masteredWords[wordLower].count++;
+            progressData.masteredWords[wordLower].lastMastered = Date.now();
+            progressData.masteredWords[wordLower].dates.push(Date.now());
+            progressData.totalWordsCorrect++;
+            await saveProgress();
+        }
+
+        async function recordWordAttempt() {
+            progressData.totalWordsAttempted++;
+            await saveProgress();
+        }
+
+        async function recordSession(wordsCorrect, wordsTotal, mode) {
+            progressData.sessions.push({
+                date: Date.now(),
+                wordsCorrect: wordsCorrect,
+                wordsTotal: wordsTotal,
+                mode: mode
+            });
+            await saveProgress();
+        }
+
+        async function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone!')) {
+                progressData = {
+                    masteredWords: {},
+                    sessions: [],
+                    totalWordsAttempted: 0,
+                    totalWordsCorrect: 0,
+                    flowerProgress: 0,
+                    startDate: Date.now()
+                };
+                await saveProgress();
+                resetFlowerGarden();
+                alert('Progress has been reset!');
+            }
+        }
+
         // Canvas setup for tracing
         const canvas = document.getElementById('tracingCanvas');
         const ctx = canvas.getContext('2d');
@@ -1398,7 +1558,8 @@
         }
 
         // Initialize game
-        function init() {
+        async function init() {
+            await loadProgress(); // Load progress from Firestore first
             loadWeeklyWords();
             // Initialize with shuffled word order for study mode
             wordOrder = shuffleArray(weeklyWords);
@@ -1649,6 +1810,10 @@
                 bloomFlower();
                 masteredWords++;
 
+                // Record mastered word in Firestore
+                recordWordMastered(currentWord);
+                recordWordAttempt();
+
                 // Change button to next
                 const nextBtn = document.getElementById('checkButton');
                 nextBtn.textContent = '➡️ Next Word!';
@@ -1863,17 +2028,29 @@
                 flower.innerHTML = flowerTemplates[i % flowerTemplates.length];
                 garden.appendChild(flower);
             }
+
+            // Restore bloomed flowers from saved progress
+            for (let i = 0; i < progressData.flowerProgress; i++) {
+                const flower = document.getElementById('flower' + i);
+                if (flower) {
+                    flower.classList.add('bloomed');
+                }
+            }
         }
 
         function bloomFlower() {
             const flowers = document.querySelectorAll('.flower:not(.bloomed)');
             if (flowers.length > 0) {
                 flowers[0].classList.add('bloomed');
+                progressData.flowerProgress = document.querySelectorAll('.flower.bloomed').length;
+                saveProgress();
             }
         }
 
         function resetFlowerGarden() {
             document.querySelectorAll('.flower').forEach(f => f.classList.remove('bloomed'));
+            progressData.flowerProgress = 0;
+            saveProgress();
         }
 
         // Sound effects (using Web Audio API)
@@ -1947,6 +2124,55 @@
 
         function closeSettings() {
             document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        // Progress Dashboard
+        function openProgressDashboard() {
+            // Calculate stats
+            const totalMastered = Object.keys(progressData.masteredWords).length;
+            const totalSessions = progressData.sessions.length;
+            const accuracyRate = progressData.totalWordsAttempted > 0
+                ? Math.round((progressData.totalWordsCorrect / progressData.totalWordsAttempted) * 100)
+                : 0;
+
+            // Update overall stats
+            document.getElementById('totalMastered').textContent = totalMastered;
+            document.getElementById('totalSessions').textContent = totalSessions;
+            document.getElementById('accuracyRate').textContent = accuracyRate + '%';
+            document.getElementById('flowersCount').textContent = progressData.flowerProgress;
+
+            // Get words mastered this week (last 7 days)
+            const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            const weeklyWordsDiv = document.getElementById('weeklyWords');
+            const weeklyMastered = Object.entries(progressData.masteredWords)
+                .filter(([word, data]) => data.lastMastered && data.lastMastered > oneWeekAgo)
+                .map(([word, data]) => word);
+
+            if (weeklyMastered.length > 0) {
+                weeklyWordsDiv.innerHTML = '<p>✨ ' + weeklyMastered.join(', ') + ' ✨</p>';
+            } else {
+                weeklyWordsDiv.innerHTML = '<p style="color: #999;">No words mastered this week yet. Keep practicing!</p>';
+            }
+
+            // Top mastered words
+            const topWordsDiv = document.getElementById('topWords');
+            const sortedWords = Object.entries(progressData.masteredWords)
+                .sort((a, b) => b[1].count - a[1].count)
+                .slice(0, 5);
+
+            if (sortedWords.length > 0) {
+                topWordsDiv.innerHTML = sortedWords
+                    .map(([word, data]) => `<p>🏅 <strong>${word}</strong>: ${data.count} time${data.count > 1 ? 's' : ''}</p>`)
+                    .join('');
+            } else {
+                topWordsDiv.innerHTML = '<p style="color: #999;">Start practicing to see your top words!</p>';
+            }
+
+            document.getElementById('progressModal').classList.add('active');
+        }
+
+        function closeProgressDashboard() {
+            document.getElementById('progressModal').classList.remove('active');
         }
 
         function saveSettings() {
@@ -2042,6 +2268,13 @@
             settingsBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 openSettings();
+            }, { passive: false });
+
+            // Progress button
+            const progressBtn = document.querySelector('.progress-button');
+            progressBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                openProgressDashboard();
             }, { passive: false });
 
             // Clear tracing button
