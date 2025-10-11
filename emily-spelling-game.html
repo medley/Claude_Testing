@@ -10,59 +10,82 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
     <style>
         /* ===== MODERN DESIGN SYSTEM ===== */
 
-        /* CSS Variables for consistent theming */
+        /* ===== APPLE DESIGN SYSTEM ===== */
+        /* CSS Variables - Apple-inspired Educational Palette */
         :root {
-            /* Color Palette - HSL for consistency */
-            --primary-pink: hsl(330, 100%, 71%);
-            --primary-purple: hsl(270, 100%, 85%);
-            --primary-mint: hsl(165, 82%, 82%);
-            --accent-pink: hsl(328, 100%, 54%);
-            --accent-purple: hsl(270, 60%, 60%);
-            --accent-mint: hsl(165, 55%, 55%);
+            /* Apple iOS Color System */
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-orange: #FF9500;
+            --ios-red: #FF3B30;
 
-            /* Neutral Colors */
-            --white: hsl(0, 0%, 100%);
-            --gray-50: hsl(0, 0%, 98%);
-            --gray-100: hsl(0, 0%, 96%);
-            --gray-200: hsl(0, 0%, 90%);
-            --gray-300: hsl(0, 0%, 80%);
-            --gray-600: hsl(0, 0%, 40%);
-            --gray-800: hsl(0, 0%, 20%);
-            --black: hsl(0, 0%, 0%);
+            /* Background & Surface */
+            --background: #F2F2F7;
+            --surface: #FFFFFF;
 
-            /* Spacing System - 8px grid */
-            --space-1: 8px;
-            --space-2: 16px;
-            --space-3: 24px;
-            --space-4: 32px;
-            --space-5: 40px;
-            --space-6: 48px;
-            --space-8: 64px;
+            /* Text Colors (with opacity) */
+            --text-primary: rgba(0, 0, 0, 0.87);
+            --text-secondary: rgba(60, 60, 67, 0.6);
+            --text-tertiary: rgba(60, 60, 67, 0.3);
 
-            /* Border Radius */
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
-            --radius-full: 9999px;
+            /* 8pt Spacing Grid (Apple Standard) */
+            --space-micro: 4px;
+            --space-small: 8px;
+            --space-medium: 16px;
+            --space-large: 24px;
+            --space-xlarge: 32px;
+            --space-xxlarge: 48px;
 
-            /* Shadows - layered depth */
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
-            --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.18);
+            /* Border Radius (Apple Standard) */
+            --radius-small: 8px;
+            --radius-medium: 12px;
+            --radius-large: 16px;
+            --radius-xlarge: 20px;
+            --radius-button: 16px;
 
-            /* Typography */
-            --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
-            --font-playful: 'Comic Sans MS', 'Arial Rounded MT Bold', cursive, sans-serif;
+            /* Apple-style Subtle Shadows */
+            --shadow-level-1: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-level-2: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-level-3: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --shadow-level-4: 0 8px 32px rgba(0, 0, 0, 0.12);
 
-            /* Transitions */
-            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 600ms cubic-bezier(0.4, 0, 0.2, 1);
+            /* Typography (SF Pro Display) */
+            --font-apple: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+
+            /* Typography Scale */
+            --font-display: 40px;
+            --font-title: 28px;
+            --font-headline: 48px;
+            --font-body: 17px;
+            --font-caption: 13px;
+            --font-button: 20px;
+
+            /* Line Heights */
+            --line-display: 1.1;
+            --line-title: 1.2;
+            --line-headline: 1.1;
+            --line-body: 1.5;
+            --line-caption: 1.3;
+
+            /* Font Weights */
+            --weight-regular: 400;
+            --weight-medium: 500;
+            --weight-semibold: 600;
+            --weight-bold: 700;
+
+            /* Apple Standard Timing */
+            --timing-micro: 100ms;
+            --timing-fast: 150ms;
+            --timing-base: 200ms;
+            --timing-transition: 300ms;
+            --timing-celebration: 600ms;
+            --timing-easing: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -83,36 +106,33 @@
         }
 
         body {
-            font-family: var(--font-system);
-            /* Modern mesh gradient background */
-            background:
-                radial-gradient(at 20% 30%, hsla(330, 100%, 85%, 0.3) 0px, transparent 50%),
-                radial-gradient(at 80% 0%, hsla(270, 100%, 90%, 0.3) 0px, transparent 50%),
-                radial-gradient(at 0% 50%, hsla(165, 82%, 88%, 0.3) 0px, transparent 50%),
-                radial-gradient(at 80% 100%, hsla(330, 100%, 88%, 0.3) 0px, transparent 50%),
-                radial-gradient(at 0% 100%, hsla(270, 100%, 92%, 0.3) 0px, transparent 50%),
-                linear-gradient(135deg,
-                    hsl(330, 100%, 92%) 0%,
-                    hsl(300, 100%, 90%) 25%,
-                    hsl(270, 100%, 88%) 50%,
-                    hsl(200, 82%, 88%) 75%,
-                    hsl(165, 82%, 85%) 100%
-                );
+            font-family: var(--font-apple);
+            font-size: var(--font-body);
+            font-weight: var(--weight-regular);
+            line-height: var(--line-body);
+            color: var(--text-primary);
+            background: var(--background);
             min-height: 100vh;
-            padding: var(--space-3);
+            padding: 0;
             overflow-x: hidden;
-            line-height: 1.6;
-            color: var(--gray-800);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
         }
 
         /* ===== LAYOUT ===== */
 
         .container {
-            max-width: 1024px;
+            max-width: 800px;
             margin: 0 auto;
+            padding: 0 var(--space-large);
             position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 var(--space-medium);
+            }
         }
 
         /* ===== GLASSMORPHISM CARD SYSTEM ===== */
@@ -152,19 +172,18 @@
         }
 
         .header h1 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 800;
-            background: linear-gradient(135deg,
-                var(--accent-pink) 0%,
-                var(--accent-purple) 50%,
-                var(--accent-mint) 100%
-            );
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: var(--space-2);
-            letter-spacing: -0.02em;
-            line-height: 1.2;
+            font-size: var(--font-display);
+            font-weight: var(--weight-bold);
+            line-height: var(--line-display);
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            margin-bottom: var(--space-small);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 32px;
+            }
         }
 
         /* ===== SPARKLE ANIMATIONS ===== */
@@ -196,203 +215,196 @@
 
         .mode-selector {
             display: flex;
-            gap: var(--space-2);
-            justify-content: center;
-            margin-bottom: var(--space-6);
-            flex-wrap: wrap;
-            padding: var(--space-1);
+            flex-direction: column;
+            gap: var(--space-medium);
+            max-width: 400px;
+            margin: var(--space-xxlarge) auto;
+            padding: 0;
         }
+
+        /* ===== APPLE BUTTON ARCHITECTURE ===== */
 
         .mode-button {
             position: relative;
-            padding: var(--space-3) var(--space-5);
-            font-size: 1.125rem;
-            font-weight: 600;
-            border: 2px solid transparent;
-            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            width: 100%;
+            height: 72px;
+            padding: 20px 24px;
+            font-family: var(--font-apple);
+            font-size: var(--font-button);
+            font-weight: var(--weight-semibold);
+            line-height: 1;
+            border: none;
+            border-radius: var(--radius-button);
             cursor: pointer;
-            font-family: var(--font-system);
-            transition: all var(--transition-base);
-            min-width: 120px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.7);
-            color: var(--gray-600);
-            box-shadow: var(--shadow-sm);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            transition: all var(--timing-base) var(--timing-easing);
+            box-shadow: var(--shadow-level-2);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .mode-button svg {
+            width: 28px;
+            height: 28px;
+            stroke-width: 2.5;
+            flex-shrink: 0;
         }
 
         .mode-button:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
         }
 
         .mode-button:active {
-            transform: translateY(0) scale(0.98);
-            transition-duration: var(--transition-fast);
+            transform: scale(0.98);
+            transition-duration: var(--timing-micro);
         }
 
-        .mode-button.active {
-            background: linear-gradient(135deg,
-                hsla(330, 100%, 75%, 0.95),
-                hsla(270, 100%, 80%, 0.95)
-            );
-            color: var(--white);
-            border-color: rgba(255, 255, 255, 0.8);
-            box-shadow: var(--shadow-lg),
-                        0 0 0 3px rgba(255, 105, 180, 0.2),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            font-weight: 700;
-            transform: scale(1.05);
+        /* Learn New Words - iOS Blue (Primary) */
+        .mode-button.study {
+            background: var(--ios-blue);
+            color: var(--surface);
         }
 
-        .mode-button.active::before {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: inherit;
-            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
-            z-index: -1;
-            opacity: 0.3;
-            filter: blur(8px);
+        .mode-button.study svg {
+            color: var(--surface);
         }
 
-        .mode-button.study.active {
-            background: linear-gradient(135deg,
-                hsla(330, 100%, 75%, 0.95),
-                hsla(310, 100%, 80%, 0.95)
-            );
+        .mode-button.study.active,
+        .mode-button.study:hover {
+            background: var(--ios-blue);
+            opacity: 0.9;
         }
 
-        .mode-button.test.active {
-            background: linear-gradient(135deg,
-                hsla(270, 100%, 80%, 0.95),
-                hsla(260, 80%, 75%, 0.95)
-            );
+        /* Spelling Test - iOS Blue (Secondary treatment) */
+        .mode-button.test {
+            background: var(--surface);
+            color: var(--ios-blue);
+            border: 2px solid rgba(0, 122, 255, 0.2);
         }
 
-        .mode-button.action.active {
-            background: linear-gradient(135deg,
-                hsla(45, 100%, 70%, 0.95),
-                hsla(30, 100%, 65%, 0.95)
-            );
+        .mode-button.test svg {
+            color: var(--ios-blue);
         }
 
-        .mode-button.sight.active {
-            background: linear-gradient(135deg,
-                hsla(165, 82%, 75%, 0.95),
-                hsla(180, 70%, 70%, 0.95)
-            );
+        .mode-button.test.active,
+        .mode-button.test:hover {
+            background: rgba(0, 122, 255, 0.05);
         }
 
+        /* Move & Spell - iOS Orange */
         .mode-button.action {
-            background: linear-gradient(135deg, #ffeb99, #ffd966);
-            color: #cc8800;
+            background: var(--ios-orange);
+            color: var(--surface);
         }
 
-        .mode-button.active {
-            transform: scale(1.1);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        .mode-button.action svg {
+            color: var(--surface);
         }
 
-        .mode-button:hover {
-            transform: scale(1.05);
+        .mode-button.action.active,
+        .mode-button.action:hover {
+            background: var(--ios-orange);
+            opacity: 0.9;
         }
 
-        /* ===== FIXED POSITION BUTTONS (SETTINGS, PROGRESS, HOME) ===== */
-
-        .settings-button {
-            position: fixed;
-            top: var(--space-4);
-            right: var(--space-4);
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 3px solid var(--accent-pink);
-            border-radius: 50%;
-            width: 64px;
-            height: 64px;
-            font-size: 1.8rem;
-            cursor: pointer;
-            z-index: 1000;
-            transition: all var(--transition-base);
-            box-shadow: var(--shadow-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Quick Words - iOS Green */
+        .mode-button.sight {
+            background: var(--ios-green);
+            color: var(--surface);
         }
 
-        .settings-button:hover {
-            transform: rotate(90deg) scale(1.05);
-            box-shadow: var(--shadow-lg);
-            background: rgba(255, 255, 255, 1);
+        .mode-button.sight svg {
+            color: var(--surface);
         }
 
-        .settings-button:active {
-            transform: rotate(90deg) scale(0.95);
+        .mode-button.sight.active,
+        .mode-button.sight:hover {
+            background: var(--ios-green);
+            opacity: 0.9;
         }
+
+        /* ===== NAVIGATION BAR (APPLE STYLE) ===== */
 
         .progress-button {
             position: fixed;
-            top: var(--space-4);
-            right: calc(64px + var(--space-4) + var(--space-4));
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 3px solid var(--accent-purple);
-            border-radius: 50%;
-            width: 64px;
-            height: 64px;
-            font-size: 1.8rem;
+            top: var(--space-medium);
+            right: var(--space-medium);
+            height: 48px;
+            background: var(--surface);
+            border: none;
+            border-radius: var(--radius-medium);
+            padding: 0 var(--space-medium);
+            font-family: var(--font-apple);
+            font-size: var(--font-body);
+            font-weight: var(--weight-medium);
+            color: var(--ios-blue);
             cursor: pointer;
             z-index: 1000;
-            transition: all var(--transition-base);
-            box-shadow: var(--shadow-md);
-            display: flex;
+            transition: all var(--timing-base) var(--timing-easing);
+            box-shadow: var(--shadow-level-1);
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: var(--space-small);
+        }
+
+        .progress-button svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
         }
 
         .progress-button:hover {
-            transform: scale(1.1);
-            box-shadow: var(--shadow-lg);
-            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-level-2);
         }
 
         .progress-button:active {
-            transform: scale(0.95);
+            transform: scale(0.98);
+            transition-duration: var(--timing-micro);
         }
 
         .home-button {
             position: fixed;
-            top: var(--space-4);
-            left: var(--space-4);
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 3px solid var(--accent-pink);
-            border-radius: var(--radius-full);
-            padding: var(--space-3) var(--space-5);
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--accent-pink);
+            top: var(--space-medium);
+            left: var(--space-medium);
+            height: 48px;
+            background: var(--surface);
+            border: none;
+            border-radius: var(--radius-medium);
+            padding: 0 var(--space-medium);
+            font-family: var(--font-apple);
+            font-size: var(--font-body);
+            font-weight: var(--weight-medium);
+            color: var(--ios-blue);
             text-decoration: none;
             cursor: pointer;
             z-index: 1000;
-            transition: all var(--transition-base);
-            font-family: var(--font-system);
-            box-shadow: var(--shadow-md);
+            transition: all var(--timing-base) var(--timing-easing);
+            box-shadow: var(--shadow-level-1);
             display: inline-flex;
             align-items: center;
-            gap: var(--space-1);
+            gap: var(--space-small);
+        }
+
+        .home-button svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
         }
 
         .home-button:hover {
-            transform: translateY(-2px) scale(1.03);
-            background: var(--accent-pink);
-            color: var(--white);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-level-2);
         }
 
         .home-button:active {
-            transform: translateY(0) scale(0.98);
+            transform: scale(0.98);
+            transition-duration: var(--timing-micro);
         }
 
         /* ===== MODAL SYSTEM (SETTINGS & PROGRESS) ===== */
@@ -422,40 +434,34 @@
         }
 
         .modal-content {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(40px) saturate(180%);
-            -webkit-backdrop-filter: blur(40px) saturate(180%);
-            padding: var(--space-8);
-            border-radius: var(--radius-2xl);
+            background: var(--surface);
+            padding: var(--space-xlarge);
+            border-radius: var(--radius-card);
             max-width: 540px;
             width: 90%;
             max-height: 85vh;
             overflow-y: auto;
-            box-shadow: var(--shadow-2xl),
-                        0 0 0 1px rgba(255, 255, 255, 0.3),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: var(--shadow-level-4);
+            animation: modalSlideIn 0.4s var(--timing-easing);
         }
 
         @keyframes modalSlideIn {
             from {
                 opacity: 0;
-                transform: translateY(30px) scale(0.95);
+                transform: translateY(var(--space-large));
             }
             to {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0);
             }
         }
 
         .modal-content h2 {
-            font-size: clamp(1.5rem, 3vw, 2rem);
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: var(--space-5);
+            font-family: var(--font-apple);
+            font-size: var(--font-title);
+            font-weight: var(--weight-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-large);
             text-align: center;
             letter-spacing: -0.02em;
         }
@@ -481,51 +487,50 @@
         }
 
         .save-button, .close-button {
-            padding: var(--space-3) var(--space-6);
-            font-size: 1.0625rem;
+            height: 48px;
+            padding: 0 var(--space-large);
+            font-family: var(--font-apple);
+            font-size: var(--font-button);
+            font-weight: var(--weight-semibold);
             border: none;
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-button);
             cursor: pointer;
-            font-family: var(--font-system);
-            font-weight: 700;
-            margin: var(--space-2) var(--space-1);
-            transition: all var(--transition-base);
-            min-height: 48px;
+            margin: var(--space-small);
+            transition: all var(--timing-base) var(--timing-easing);
         }
 
         .save-button {
-            background: linear-gradient(135deg,
-                hsla(165, 82%, 75%, 0.95),
-                hsla(180, 70%, 70%, 0.95)
-            );
-            color: var(--white);
-            box-shadow: var(--shadow-sm);
+            background: var(--ios-blue);
+            color: var(--surface);
+            box-shadow: var(--shadow-level-1);
         }
 
         .save-button:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-level-2);
+            background: #0051D5;
         }
 
         .save-button:active {
-            transform: translateY(0);
-            box-shadow: var(--shadow-xs);
+            transform: scale(0.98);
+            transition-duration: var(--timing-fast);
         }
 
         .close-button {
-            background: var(--gray-100);
-            color: var(--gray-600);
-            box-shadow: var(--shadow-xs);
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-level-1);
         }
 
         .close-button:hover {
-            background: var(--gray-200);
+            background: rgba(0, 0, 0, 0.08);
             transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow-level-2);
         }
 
         .close-button:active {
-            transform: translateY(0);
+            transform: scale(0.98);
+            transition-duration: var(--timing-fast);
         }
 
         /* ===== AUTH SCREEN (FLOATING CARD DESIGN) ===== */
@@ -535,168 +540,149 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: var(--space-3);
+            padding: var(--space-medium);
         }
 
         .auth-box {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(30px) saturate(180%);
-            -webkit-backdrop-filter: blur(30px) saturate(180%);
-            padding: var(--space-8);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-xl),
-                        0 0 0 1px rgba(255, 255, 255, 0.5),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.7);
-            max-width: 420px;
+            background: var(--surface);
+            padding: var(--space-xxlarge);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-level-3);
+            max-width: 400px;
             width: 100%;
             text-align: center;
-            animation: floatIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: floatIn 0.4s var(--timing-easing) forwards;
         }
 
         @keyframes floatIn {
             from {
                 opacity: 0;
-                transform: translateY(30px) scale(0.95);
+                transform: translateY(var(--space-medium));
             }
             to {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0);
             }
         }
 
         .auth-box h1 {
-            font-size: clamp(1.75rem, 4vw, 2.5rem);
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: var(--space-2);
+            font-family: var(--font-apple);
+            font-size: var(--font-display);
+            font-weight: var(--weight-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-small);
             letter-spacing: -0.02em;
         }
 
         .auth-box p {
-            color: var(--gray-600);
-            margin-bottom: var(--space-6);
-            font-size: 1.0625rem;
-            line-height: 1.5;
+            font-family: var(--font-apple);
+            font-size: var(--font-body);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xlarge);
+            line-height: 1.47;
         }
 
         .auth-input {
             width: 100%;
-            padding: var(--space-3) var(--space-4);
-            margin-bottom: var(--space-3);
-            border: 2px solid rgba(255, 105, 180, 0.2);
-            border-radius: var(--radius-lg);
-            font-size: 1rem;
-            font-family: var(--font-system);
+            height: 48px;
+            padding: 0 var(--space-medium);
+            margin-bottom: var(--space-medium);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius-input);
+            font-family: var(--font-apple);
+            font-size: var(--font-body);
+            color: var(--text-primary);
             box-sizing: border-box;
-            transition: all var(--transition-base);
-            background: rgba(255, 255, 255, 0.8);
+            transition: all var(--timing-base) var(--timing-easing);
+            background: var(--surface);
+            -webkit-appearance: none;
         }
 
         .auth-input:focus {
             outline: none;
-            border-color: var(--accent-pink);
-            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.15),
-                        var(--shadow-md);
-            transform: scale(1.01);
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
         }
 
         .auth-input::placeholder {
-            color: var(--gray-300);
+            color: var(--text-secondary);
         }
 
         .auth-button {
             width: 100%;
-            padding: var(--space-3) var(--space-4);
-            margin-bottom: var(--space-2);
+            height: 48px;
+            margin-bottom: var(--space-medium);
             border: none;
-            border-radius: var(--radius-lg);
-            font-size: 1.0625rem;
-            font-weight: 700;
+            border-radius: var(--radius-button);
+            font-family: var(--font-apple);
+            font-size: var(--font-button);
+            font-weight: var(--weight-semibold);
             cursor: pointer;
-            font-family: var(--font-system);
-            transition: all var(--transition-base);
+            transition: all var(--timing-base) var(--timing-easing);
             position: relative;
-            overflow: hidden;
-            min-height: 52px;
-        }
-
-        .auth-button::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.2),
-                transparent
-            );
-            opacity: 0;
-            transition: opacity var(--transition-base);
         }
 
         .auth-button:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .auth-button:hover::before {
-            opacity: 1;
+            box-shadow: var(--shadow-level-2);
         }
 
         .auth-button:active {
-            transform: translateY(0) scale(0.98);
-            transition-duration: var(--transition-fast);
+            transform: scale(0.98);
+            transition-duration: var(--timing-fast);
         }
 
         .auth-button.primary {
-            background: linear-gradient(135deg,
-                var(--accent-pink),
-                var(--accent-purple)
-            );
-            color: var(--white);
-            box-shadow: var(--shadow-md),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            background: var(--ios-blue);
+            color: var(--surface);
+            box-shadow: var(--shadow-level-1);
+        }
+
+        .auth-button.primary:hover {
+            background: #0051D5;
         }
 
         .auth-button.secondary {
-            background: linear-gradient(135deg, #98e5d5, #7dd3c0);
-            color: white;
+            background: var(--ios-green);
+            color: var(--surface);
+            box-shadow: var(--shadow-level-1);
+        }
+
+        .auth-button.secondary:hover {
+            background: #28A745;
         }
 
         .auth-link {
-            color: #9c27b0;
+            font-family: var(--font-apple);
+            font-size: var(--font-body);
+            color: var(--ios-blue);
             cursor: pointer;
-            text-decoration: underline;
-            font-size: 0.95rem;
-            margin-top: 15px;
+            text-decoration: none;
+            margin-top: var(--space-medium);
             display: inline-block;
+            transition: opacity var(--timing-base) var(--timing-easing);
         }
 
         .auth-link:hover {
-            color: #7b1fa2;
+            opacity: 0.7;
         }
 
         /* ===== GAME AREA (GLASSMORPHISM CARD) ===== */
 
         .game-area {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: var(--radius-2xl);
-            padding: var(--space-8);
-            box-shadow: var(--shadow-xl),
-                        0 0 0 1px rgba(255, 255, 255, 0.3),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            background: var(--surface);
+            border-radius: var(--radius-card);
+            padding: var(--space-xlarge);
+            box-shadow: var(--shadow-level-2);
             position: relative;
             overflow: hidden;
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: slideUp 0.4s var(--timing-easing);
         }
 
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(var(--space-medium));
             }
             to {
                 opacity: 1;
@@ -722,77 +708,54 @@
 
         .word-display {
             text-align: center;
-            font-size: 3rem;
-            color: #ff69b4;
-            margin-bottom: 20px;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: var(--font-headline);
+            font-weight: var(--weight-bold);
+            line-height: var(--line-headline);
+            letter-spacing: 2px;
+            color: var(--text-primary);
+            margin-bottom: var(--space-large);
+            text-transform: uppercase;
         }
 
-        /* ===== ACTION BUTTONS (SPEAK, CHECK, CLEAR) ===== */
+        /* ===== GAME ACTION BUTTONS (APPLE STYLE) ===== */
 
         .speak-button {
-            display: block;
-            margin: var(--space-5) auto;
-            padding: var(--space-4) var(--space-7);
-            font-size: 1.3rem;
-            background: linear-gradient(135deg,
-                hsla(270, 100%, 85%, 0.95),
-                hsla(280, 100%, 80%, 0.95)
-            );
-            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-small);
+            margin: var(--space-large) auto;
+            height: 64px;
+            padding: 0 var(--space-xlarge);
+            font-family: var(--font-apple);
+            font-size: 20px;
+            font-weight: var(--weight-semibold);
+            background: var(--ios-blue);
+            color: var(--surface);
             border: none;
-            border-radius: var(--radius-full);
+            border-radius: var(--radius-large);
             cursor: pointer;
-            font-family: var(--font-system);
-            font-weight: 700;
-            box-shadow: 0 4px 0 hsla(270, 100%, 65%, 0.4),
-                        var(--shadow-md);
-            transition: all var(--transition-base);
-            position: relative;
-            overflow: hidden;
-            min-height: 56px;
-            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-level-2);
+            transition: all var(--timing-base) var(--timing-easing);
+            min-width: 240px;
+            white-space: nowrap;
         }
 
-        .speak-button::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.3),
-                transparent
-            );
-            opacity: 0;
-            transition: opacity var(--transition-base);
+        .speak-button svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2.5;
+            flex-shrink: 0;
         }
 
         .speak-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 0 hsla(270, 100%, 65%, 0.4),
-                        var(--shadow-lg);
-        }
-
-        .speak-button:hover::before {
-            opacity: 1;
+            box-shadow: var(--shadow-level-3);
         }
 
         .speak-button:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 hsla(270, 100%, 65%, 0.4),
-                        var(--shadow-sm);
-            transition-duration: var(--transition-fast);
-        }
-
-        @media (prefers-reduced-motion: no-preference) {
-            .speak-button:hover {
-                animation: pulse 1.5s ease-in-out infinite;
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: translateY(-2px) scale(1); }
-            50% { transform: translateY(-2px) scale(1.02); }
+            transform: scale(0.98);
+            transition-duration: var(--timing-micro);
         }
 
         .tracing-area {
@@ -825,28 +788,25 @@
         .letter-box {
             width: 56px;
             height: 68px;
-            border: 3px solid rgba(255, 105, 180, 0.25);
-            border-radius: var(--radius-lg);
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius-medium);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent-pink);
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.95),
-                rgba(255, 240, 250, 0.95)
-            );
+            font-family: var(--font-apple);
+            font-size: 32px;
+            font-weight: var(--weight-semibold);
+            color: var(--text-secondary);
+            background: var(--surface);
             text-transform: uppercase;
-            box-shadow: var(--shadow-sm),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            transition: all var(--transition-base);
+            box-shadow: var(--shadow-level-1);
+            transition: all var(--timing-base) var(--timing-easing);
         }
 
         .letter-box:not(:empty) {
-            border-color: var(--accent-pink);
-            box-shadow: var(--shadow-md),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border-color: var(--ios-blue);
+            color: var(--ios-blue);
+            box-shadow: var(--shadow-level-2);
             animation: letterPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
@@ -866,105 +826,84 @@
 
         .input-area {
             text-align: center;
-            margin-top: 20px;
+            margin-top: var(--space-6);
+        }
+
+        .input-heading {
+            font-size: var(--font-body);
+            font-weight: var(--weight-semibold);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* ===== SPELLING INPUT & LETTER BOXES ===== */
 
         .spelling-input {
-            font-size: 2rem;
-            padding: var(--space-4);
-            border: 3px solid rgba(255, 105, 180, 0.3);
-            border-radius: var(--radius-xl);
+            font-family: var(--font-apple);
+            font-size: 32px;
+            font-weight: var(--weight-semibold);
+            padding: var(--space-medium);
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius-large);
             text-align: center;
-            font-family: var(--font-system);
-            font-weight: 600;
             width: 100%;
             max-width: 480px;
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--accent-pink);
-            transition: all var(--transition-base);
-            box-shadow: var(--shadow-sm),
-                        inset 0 2px 4px rgba(0, 0, 0, 0.02);
+            background: var(--surface);
+            color: var(--text-primary);
+            transition: all var(--timing-base) var(--timing-easing);
+            box-shadow: var(--shadow-level-1);
         }
 
         .spelling-input:focus {
             outline: none;
-            border-color: var(--accent-pink);
-            box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.15),
-                        var(--shadow-md);
-            transform: scale(1.02);
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1),
+                        var(--shadow-level-2);
         }
 
         .check-button {
-            display: block;
-            margin: var(--space-5) auto;
-            padding: var(--space-5) var(--space-8);
-            font-size: 1.5rem;
-            background: linear-gradient(135deg,
-                hsla(330, 100%, 75%, 0.95),
-                hsla(320, 100%, 70%, 0.95)
-            );
-            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-small);
+            margin: var(--space-large) auto;
+            height: 64px;
+            padding: 0 var(--space-xlarge);
+            font-family: var(--font-apple);
+            font-size: 20px;
+            font-weight: var(--weight-semibold);
+            background: var(--ios-green);
+            color: var(--surface);
             border: none;
-            border-radius: var(--radius-full);
+            border-radius: var(--radius-large);
             cursor: pointer;
-            font-family: var(--font-system);
-            font-weight: 700;
-            box-shadow: 0 6px 0 hsla(320, 100%, 55%, 0.4),
-                        var(--shadow-lg);
-            transition: all var(--transition-base);
-            min-height: 64px;
-            position: relative;
-            overflow: hidden;
+            box-shadow: var(--shadow-level-2);
+            transition: all var(--timing-base) var(--timing-easing);
+            min-width: 240px;
+            white-space: nowrap;
         }
 
-        .check-button::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.3),
-                transparent
-            );
-            opacity: 0;
-            transition: opacity var(--transition-base);
+        .check-button svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 3;
+            flex-shrink: 0;
         }
 
         .check-button:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 0 hsla(320, 100%, 55%, 0.4),
-                        var(--shadow-xl);
-        }
-
-        .check-button:hover::before {
-            opacity: 1;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-level-3);
         }
 
         .check-button:active {
-            transform: translateY(3px) scale(0.98);
-            box-shadow: 0 3px 0 hsla(320, 100%, 55%, 0.4),
-                        var(--shadow-sm);
-            transition-duration: var(--transition-fast);
+            transform: scale(0.98);
+            transition-duration: var(--timing-micro);
         }
 
         .next-button {
-            background: linear-gradient(135deg,
-                hsla(165, 82%, 75%, 0.95),
-                hsla(180, 70%, 70%, 0.95)
-            );
-            box-shadow: 0 6px 0 hsla(170, 70%, 55%, 0.4),
-                        var(--shadow-lg);
-        }
-
-        .next-button:hover {
-            box-shadow: 0 8px 0 hsla(170, 70%, 55%, 0.4),
-                        var(--shadow-xl);
-        }
-
-        .next-button:active {
-            box-shadow: 0 3px 0 hsla(170, 70%, 55%, 0.4),
-                        var(--shadow-sm);
+            background: var(--ios-blue);
         }
 
         /* ===== FLOWER GARDEN (PROGRESS VISUALIZATION) ===== */
@@ -1113,34 +1052,30 @@
 
         .clear-trace-button {
             display: block;
-            margin: var(--space-3) auto;
-            padding: var(--space-2) var(--space-4);
-            font-size: 1rem;
-            background: linear-gradient(135deg,
-                hsla(45, 100%, 70%, 0.95),
-                hsla(30, 100%, 65%, 0.95)
-            );
-            color: var(--white);
+            margin: var(--space-medium) auto;
+            padding: var(--space-small) var(--space-medium);
+            height: 44px;
+            font-family: var(--font-apple);
+            font-size: var(--font-body);
+            font-weight: var(--weight-semibold);
+            background: var(--ios-orange);
+            color: var(--surface);
             border: none;
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-button);
             cursor: pointer;
-            font-family: var(--font-system);
-            font-weight: 600;
-            box-shadow: 0 3px 0 hsla(30, 100%, 50%, 0.4),
-                        var(--shadow-sm);
-            transition: all var(--transition-base);
+            box-shadow: var(--shadow-level-1);
+            transition: all var(--timing-base) var(--timing-easing);
         }
 
         .clear-trace-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 0 hsla(30, 100%, 50%, 0.4),
-                        var(--shadow-md);
+            box-shadow: var(--shadow-level-2);
+            background: #E67D00;
         }
 
         .clear-trace-button:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 0 hsla(30, 100%, 50%, 0.4),
-                        var(--shadow-xs);
+            transform: scale(0.98);
+            transition-duration: var(--timing-fast);
         }
 
         .particle {
@@ -1452,79 +1387,49 @@
 
         .key-button {
             position: relative;
-            min-width: 64px;
-            min-height: 64px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            border: none;
-            border-radius: var(--radius-lg);
-            background: linear-gradient(135deg,
-                hsla(330, 100%, 90%, 0.95),
-                hsla(320, 100%, 85%, 0.95)
-            );
-            color: var(--accent-pink);
+            min-width: 60px;
+            min-height: 60px;
+            font-family: var(--font-apple);
+            font-size: 22px;
+            font-weight: var(--weight-medium);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius-small);
+            background: var(--surface);
+            color: var(--text-primary);
             cursor: pointer;
-            font-family: var(--font-system);
-            transition: all var(--transition-fast);
+            transition: all var(--timing-fast) var(--timing-easing);
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
-            box-shadow: 0 4px 0 hsla(320, 100%, 70%, 0.4),
-                        var(--shadow-sm);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .key-button::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            background: linear-gradient(180deg,
-                rgba(255, 255, 255, 0.4) 0%,
-                rgba(255, 255, 255, 0) 50%,
-                rgba(0, 0, 0, 0.05) 100%
-            );
-            pointer-events: none;
+            box-shadow: var(--shadow-level-1);
         }
 
         .key-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 hsla(320, 100%, 70%, 0.4),
-                        var(--shadow-md);
+            background: rgba(0, 122, 255, 0.05);
+            border-color: var(--ios-blue);
         }
 
         .key-button:active,
         .key-button.pressed {
-            transform: translateY(2px) scale(0.97);
-            box-shadow: 0 2px 0 hsla(320, 100%, 70%, 0.4),
-                        var(--shadow-sm);
-            background: linear-gradient(135deg,
-                hsla(320, 100%, 75%, 0.95),
-                hsla(310, 100%, 70%, 0.95)
-            );
+            transform: scale(0.95);
+            background: rgba(0, 122, 255, 0.1);
+            transition-duration: var(--timing-micro);
         }
 
         .key-button.backspace {
-            background: linear-gradient(135deg,
-                hsla(270, 100%, 85%, 0.95),
-                hsla(260, 80%, 80%, 0.95)
-            );
-            color: var(--accent-purple);
+            background: var(--ios-orange);
+            color: var(--surface);
+            border: none;
             min-width: 96px;
-            box-shadow: 0 4px 0 hsla(260, 80%, 65%, 0.4),
-                        var(--shadow-sm);
         }
 
         .key-button.backspace:hover {
-            box-shadow: 0 6px 0 hsla(260, 80%, 65%, 0.4),
-                        var(--shadow-md);
+            opacity: 0.9;
         }
 
         .key-button.backspace:active {
-            box-shadow: 0 2px 0 hsla(260, 80%, 65%, 0.4),
-                        var(--shadow-sm);
+            transform: scale(0.95);
         }
 
         @keyframes keyPress {
@@ -1550,7 +1455,7 @@
         .settings-button:focus-visible,
         .progress-button:focus-visible,
         .home-button:focus-visible {
-            outline: 3px solid var(--accent-pink);
+            outline: 3px solid var(--ios-blue);
             outline-offset: 3px;
         }
 
@@ -1589,14 +1494,14 @@
     <!-- Authentication Screen -->
     <div id="authScreen" class="auth-container">
         <div class="auth-box">
-            <h1>✨ Welcome! ✨</h1>
-            <p id="authSubtext" style="color: #ff69b4; font-weight: bold;">First time here? Create an account below!</p>
+            <h1>Welcome!</h1>
+            <p id="authSubtext">First time here? Create an account below!</p>
 
-            <input type="email" id="authEmail" class="auth-input" placeholder="📧 Email" />
-            <input type="password" id="authPassword" class="auth-input" placeholder="🔒 Password" />
+            <input type="email" id="authEmail" class="auth-input" placeholder="Email" />
+            <input type="password" id="authPassword" class="auth-input" placeholder="Password" />
 
-            <button class="auth-button primary" onclick="signIn()">🔑 Log In (Existing Students)</button>
-            <button class="auth-button secondary" onclick="createAccount()">✨ Create New Account</button>
+            <button class="auth-button primary" onclick="signIn()">Log In</button>
+            <button class="auth-button secondary" onclick="createAccount()">Create New Account</button>
 
             <div class="auth-link" onclick="forgotPassword()">Forgot Password?</div>
 
@@ -1606,27 +1511,36 @@
 
     <!-- Game Screen (hidden until authenticated) -->
     <div id="gameScreen" style="display: none;">
-        <button class="settings-button" onclick="openSettings()">⚙️</button>
-        <button class="progress-button" onclick="openProgressDashboard()">📊</button>
-        <a href="index.html" class="home-button">🏠 Home</a>
+        <button class="progress-button" onclick="openProgressDashboard()">
+            <i data-lucide="bar-chart-3"></i>
+            Progress
+        </button>
+        <a href="index.html" class="home-button">
+            <i data-lucide="home"></i>
+            Home
+        </a>
 
         <div class="container">
         <div class="header">
-            <h1>✨ Emily's Magical Spelling Game ✨</h1>
+            <h1>Emily's Magical Spelling Game</h1>
         </div>
 
         <div class="mode-selector">
             <button class="mode-button study active" onclick="setMode('study')">
-                📖 Study Mode
+                <i data-lucide="book-open"></i>
+                Learn New Words
             </button>
             <button class="mode-button test" onclick="setMode('test')">
-                📝 Test Mode
+                <i data-lucide="pencil-line"></i>
+                Spelling Test
             </button>
             <button class="mode-button action" onclick="setMode('action')">
-                🎭 Action Practice
+                <i data-lucide="activity"></i>
+                Move & Spell
             </button>
             <button class="mode-button sight" onclick="setMode('sight')">
-                👀 Sight Words
+                <i data-lucide="zap"></i>
+                Quick Words
             </button>
         </div>
 
@@ -1635,23 +1549,27 @@
             <div class="animal-container" id="animalContainer">
                 <svg class="animal-svg" id="animalSVG" viewBox="0 0 200 200"></svg>
             </div>
-            <div class="word-display" id="wordDisplay">Let's start!</div>
-            <button class="speak-button" onclick="speakWord()">🔊 Hear the Word</button>
+            <div class="word-display" id="wordDisplay">Ready to learn!</div>
+            <button class="speak-button" onclick="speakWord()">
+                <i data-lucide="volume-2"></i>
+                <span>Hear the Word</span>
+            </button>
 
             <div class="action-instruction" id="actionInstruction" style="display: none;"></div>
             <div class="action-demo" id="actionDemo" style="display: none;"></div>
 
             <div class="tracing-area" id="tracingArea">
-                <p style="text-align: center; color: #ff69b4; margin-bottom: 10px; font-size: 1.2rem;">
-                    ✨ Trace the letters with your finger! ✨
+                <p style="text-align: center; color: var(--ios-blue); margin-bottom: 10px; font-size: 1.2rem; font-family: var(--font-apple); font-weight: var(--weight-semibold);">
+                    Trace the letters with your finger
                 </p>
                 <canvas id="tracingCanvas" class="tracing-canvas" width="600" height="200"></canvas>
-                <button class="clear-trace-button" onclick="clearTracing()">🧹 Clear & Try Again</button>
+                <button class="clear-trace-button" onclick="clearTracing()">Clear & Try Again</button>
             </div>
 
             <div class="letter-boxes" id="letterBoxes"></div>
 
             <div class="input-area">
+                <h3 class="input-heading">Type what you hear</h3>
                 <input
                     type="text"
                     class="spelling-input"
@@ -1700,7 +1618,8 @@
             </div>
 
             <button class="check-button" id="checkButton" onclick="checkSpelling()">
-                ✅ Check My Spelling!
+                <i data-lucide="check"></i>
+                <span>Check Answer</span>
             </button>
         </div>
     </div>
@@ -1737,7 +1656,7 @@
                 </div>
 
                 <div style="background: linear-gradient(135deg, #e0f7fa, #f0f9ff); padding: 20px; border-radius: 15px; margin-bottom: 15px;">
-                    <h3 style="margin-bottom: 10px;">🌟 This Week's Stars</h3>
+                    <h3 style="margin-bottom: 10px;">This Week's Stars</h3>
                     <div id="weeklyWords" style="font-size: 14px;"></div>
                 </div>
 
@@ -1916,7 +1835,7 @@
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 currentUser = userCredential.user;
                 userId = currentUser.uid;
-                showAuthMessage('🎉 Account created successfully! Welcome to the spelling game!');
+                showAuthMessage('Account created successfully! Welcome to the spelling game!');
                 setTimeout(() => showGameScreen(), 1500);
             } catch (error) {
                 console.error('Signup error:', error);
@@ -1925,7 +1844,7 @@
                 if (error.code === 'auth/email-already-in-use') {
                     showAuthMessage('💡 This email already has an account! Try logging in with the button above instead. 🔑', true);
                 } else if (error.code === 'auth/invalid-email') {
-                    showAuthMessage('📧 Hmm, that email doesn\'t look quite right. Can you check it again?', true);
+                    showAuthMessage('Hmm, that email doesn\'t look quite right. Can you check it again?', true);
                 } else if (error.code === 'auth/weak-password') {
                     showAuthMessage('🔒 Your password needs to be stronger! Try adding more letters or numbers.', true);
                 } else {
@@ -1950,7 +1869,7 @@
                 currentUser = userCredential.user;
                 userId = currentUser.uid;
 
-                showAuthMessage('✨ Welcome back! Loading your spelling game...');
+                showAuthMessage('Welcome back! Loading your spelling game...');
 
                 // Check if teacher account
                 if (email === 'teacher@emilygame.com') {
@@ -1963,13 +1882,13 @@
 
                 // Kid-friendly error messages
                 if (error.code === 'auth/user-not-found') {
-                    showAuthMessage('🔍 We couldn\'t find that account. Try creating a new account with the button below! ✨', true);
+                    showAuthMessage('We couldn\'t find that account. Try creating a new account with the button below!', true);
                 } else if (error.code === 'auth/wrong-password') {
-                    showAuthMessage('🔑 Oops! That password doesn\'t match. Try again or click "Forgot Password?" below for help.', true);
+                    showAuthMessage('Oops! That password doesn\'t match. Try again or click "Forgot Password?" below for help.', true);
                 } else if (error.code === 'auth/invalid-email') {
-                    showAuthMessage('📧 Hmm, that email doesn\'t look quite right. Can you check it again?', true);
+                    showAuthMessage('Hmm, that email doesn\'t look quite right. Can you check it again?', true);
                 } else if (error.code === 'auth/too-many-requests') {
-                    showAuthMessage('⏰ Too many tries! Please wait a few minutes and try again, or reset your password.', true);
+                    showAuthMessage('Too many tries! Please wait a few minutes and try again, or reset your password.', true);
                 } else {
                     showAuthMessage('😊 Oops! Something went wrong. Please try again or ask a grown-up for help!', true);
                 }
@@ -1996,7 +1915,7 @@
                 if (error.code === 'auth/user-not-found') {
                     showAuthMessage('🔍 We couldn\'t find an account with that email. Try creating a new account instead!', true);
                 } else if (error.code === 'auth/invalid-email') {
-                    showAuthMessage('📧 Hmm, that email doesn\'t look quite right. Can you check it again?', true);
+                    showAuthMessage('Hmm, that email doesn\'t look quite right. Can you check it again?', true);
                 } else {
                     showAuthMessage('😊 Oops! We couldn\'t send the reset email. Please try again or ask a grown-up for help!', true);
                 }
@@ -2638,7 +2557,7 @@
             },
             'again': {
                 instruction: 'Clap twice as you spell it — once for A-G and once for A-I-N',
-                emoji: '👏',
+                emoji: '',
                 audio: 'Clap twice as you spell again! Do it again!'
             },
             'grass': {
@@ -3038,7 +2957,7 @@
         // Action complete
         function actionComplete() {
             playSuccessSound();
-            showEncouragement('Great job doing the action! You\'re amazing! ✨');
+            showEncouragement('Great job doing the action! You\'re amazing!');
             bloomFlower();
             masteredWords++;
 
@@ -3061,7 +2980,7 @@
                 // Correct!
                 playSuccessSound();
                 showCelebration();
-                showEncouragement('Perfect! You are amazing! ✨🌟');
+                showEncouragement('Perfect! You are amazing!');
                 bloomFlower();
                 masteredWords++;
 
@@ -3404,7 +3323,7 @@
                 .map(([word, data]) => word);
 
             if (weeklyMastered.length > 0) {
-                weeklyWordsDiv.innerHTML = '<p>✨ ' + weeklyMastered.join(', ') + ' ✨</p>';
+                weeklyWordsDiv.innerHTML = '<p>' + weeklyMastered.join(', ') + '</p>';
             } else {
                 weeklyWordsDiv.innerHTML = '<p style="color: #999;">No words mastered this week yet. Keep practicing!</p>';
             }
@@ -3609,6 +3528,20 @@
             </div>
         </div>
     </div>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        // Initialize Lucide icons after DOM is loaded
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+
+            // Re-initialize icons whenever new elements are added dynamically
+            const observer = new MutationObserver(() => {
+                lucide.createIcons();
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+    </script>
 
 </body>
 </html>
