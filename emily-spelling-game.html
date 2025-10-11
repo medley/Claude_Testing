@@ -1178,8 +1178,32 @@
                 --space-8: 32px;
             }
 
+            /* Header spacing and title size */
+            .header {
+                margin-bottom: var(--space-8);
+                margin-top: var(--space-4);
+            }
+
             .header h1 {
-                font-size: clamp(1.5rem, 5vw, 2rem);
+                font-size: 2rem;
+            }
+
+            /* Stack mode buttons vertically on mobile */
+            .mode-selector {
+                flex-direction: column;
+                gap: var(--space-3);
+                padding: var(--space-3);
+                margin-bottom: var(--space-8);
+                max-width: 300px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .mode-button {
+                width: 100%;
+                min-width: auto;
+                font-size: 1rem;
+                padding: var(--space-3) var(--space-4);
             }
 
             .animal-svg {
@@ -1201,27 +1225,22 @@
                 padding: var(--space-3);
             }
 
+            /* Smaller fixed buttons on mobile */
             .settings-button, .progress-button {
-                width: 52px;
-                height: 52px;
-                font-size: 1.5rem;
+                width: 48px;
+                height: 48px;
+                font-size: 1.4rem;
                 top: var(--space-2);
             }
 
             .progress-button {
-                right: calc(52px + var(--space-2) + var(--space-2));
+                right: calc(48px + var(--space-2) + var(--space-2));
             }
 
             .home-button {
-                font-size: 1.125rem;
-                padding: var(--space-2) var(--space-4);
-                top: var(--space-2);
-            }
-
-            .mode-button {
-                min-width: 100px;
                 font-size: 1rem;
-                padding: var(--space-2) var(--space-4);
+                padding: var(--space-2) var(--space-3);
+                top: var(--space-2);
             }
 
             .speak-button, .check-button {
@@ -1257,31 +1276,54 @@
             }
         }
 
+        /* Small mobile (iPhone SE, etc.) - 320px to 480px */
         @media (max-width: 480px) {
+            /* Title size reduced to 32px on small screens */
+            .header {
+                margin-top: var(--space-5);
+                margin-bottom: var(--space-6);
+            }
+
             .header h1 {
-                font-size: clamp(1.25rem, 6vw, 1.75rem);
+                font-size: 2rem; /* 32px */
+            }
+
+            /* More breathing room for stacked mode buttons */
+            .mode-selector {
+                gap: var(--space-2);
+                padding: var(--space-2);
+                margin-bottom: var(--space-6);
+                max-width: 280px;
+            }
+
+            .mode-button {
+                font-size: 0.9375rem;
+                padding: var(--space-2) var(--space-3);
             }
 
             .game-area {
                 padding: var(--space-4);
+                margin-top: var(--space-4);
             }
 
-            .settings-button, .progress-button, .home-button {
-                font-size: 1.125rem;
-            }
-
+            /* Smaller fixed buttons on small mobile */
             .settings-button, .progress-button {
-                width: 44px;
-                height: 44px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.25rem;
+                top: var(--space-1);
+                right: var(--space-1);
             }
 
             .progress-button {
-                right: calc(44px + var(--space-2) + var(--space-1));
+                right: calc(40px + var(--space-1) + var(--space-2));
             }
 
-            .mode-button {
-                min-width: 80px;
-                font-size: 0.875rem;
+            .home-button {
+                font-size: 0.9375rem;
+                padding: var(--space-1) var(--space-2);
+                top: var(--space-1);
+                left: var(--space-1);
             }
 
             .speak-button, .check-button {
@@ -1290,28 +1332,63 @@
             }
 
             .key-button {
-                min-width: 45px;
-                min-height: 45px;
+                min-width: 42px;
+                min-height: 42px;
                 font-size: 1.25rem;
             }
 
             .spelling-input {
                 font-size: 1.25rem;
+                padding: var(--space-2);
             }
 
             .letter-box {
-                width: 42px;
-                height: 50px;
+                width: 40px;
+                height: 48px;
                 font-size: 1.5rem;
             }
 
             .encouragement {
                 font-size: 1.125rem;
-                padding: var(--space-4) var(--space-5);
+                padding: var(--space-3) var(--space-4);
             }
 
             .celebration {
                 font-size: 2.5rem;
+            }
+
+            .on-screen-keyboard {
+                padding: var(--space-3);
+                gap: var(--space-1);
+            }
+
+            .keyboard-row {
+                gap: var(--space-1);
+            }
+        }
+
+        /* Extra small screens (320px) */
+        @media (max-width: 360px) {
+            .header h1 {
+                font-size: 1.75rem; /* 28px for very small screens */
+            }
+
+            .mode-selector {
+                max-width: 260px;
+            }
+
+            .settings-button, .progress-button {
+                width: 36px;
+                height: 36px;
+                font-size: 1.125rem;
+            }
+
+            .progress-button {
+                right: calc(36px + var(--space-1) + var(--space-2));
+            }
+
+            .home-button {
+                font-size: 0.875rem;
             }
         }
 
