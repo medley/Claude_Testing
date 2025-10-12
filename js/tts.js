@@ -155,8 +155,8 @@ function hideSpeechLoading() {
 
 /**
  * Speaks the current word using best practice spelling instruction:
- * word → pause → letters → pause → word
- * This follows educational best practices for spelling instruction.
+ * letters → pause → word → pause → letters
+ * Pattern: "t h e, the, t h e" (spell once, word once, spell once)
  */
 async function speakWord() {
     console.log('🎯 speakWord() called for word:', currentWord);
@@ -164,13 +164,7 @@ async function speakWord() {
     createSparkles(document.querySelector('.speak-button'));
 
     try {
-        // Step 1: Say the full word first
-        await speakWithGoogleTTS(currentWord, true);
-
-        // Step 2: Pause 500ms
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Step 3: Spell out letter by letter
+        // Step 1: Spell out letter by letter (first time)
         const letters = currentWord.toUpperCase().split('');
         for (let i = 0; i < letters.length; i++) {
             const letter = letters[i].toLowerCase();
@@ -179,11 +173,22 @@ async function speakWord() {
             await new Promise(resolve => setTimeout(resolve, 300));
         }
 
+        // Step 2: Pause 500ms
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Step 3: Say the full word
+        await speakWithGoogleTTS(currentWord, true);
+
         // Step 4: Pause 800ms
         await new Promise(resolve => setTimeout(resolve, 800));
 
-        // Step 5: Say the full word again
-        await speakWithGoogleTTS(currentWord, true);
+        // Step 5: Spell out letter by letter (second time)
+        for (let i = 0; i < letters.length; i++) {
+            const letter = letters[i].toLowerCase();
+            await speakWithGoogleTTS(letter, true);
+            // Pause between letters
+            await new Promise(resolve => setTimeout(resolve, 300));
+        }
 
     } catch (error) {
         console.error('❌ Error in speakWord:', error);
