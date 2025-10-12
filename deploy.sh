@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Fast deploy script - only stages tracked files
+# Fast deploy script
 set -e
 
 # Check if in a git repository
@@ -29,9 +29,9 @@ if [ -z "$COMMIT_MSG" ]; then
     exit 1
 fi
 
-# Stage ONLY tracked files (no directory scanning)
+# Stage ALL files (including new ones)
 echo "📦 Staging changes..."
-git add -u
+git add .
 
 echo "💾 Committing: $COMMIT_MSG"
 git commit -m "$COMMIT_MSG"

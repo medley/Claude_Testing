@@ -1,0 +1,728 @@
+/* ===== GAME STYLES =====
+ * Game-specific styles including:
+ * - Sparkle animations
+ * - Game area and components
+ * - Animal container
+ * - Word display
+ * - Action buttons (speak, check)
+ * - Tracing area and canvas
+ * - Letter boxes
+ * - Spelling input
+ * - On-screen keyboard
+ * - Flower garden (progress visualization)
+ * - Celebration effects
+ * - Action mode styles
+ * - Particles
+ * - Game-specific responsive design
+ */
+
+/* ===================================
+   SPARKLE ANIMATIONS
+   =================================== */
+
+.sparkle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: sparkleFloat 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.9),
+                0 0 20px rgba(255, 105, 180, 0.5);
+}
+
+@keyframes sparkleFloat {
+    0% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-120px) scale(0) rotate(180deg);
+        opacity: 0;
+    }
+}
+
+/* ===================================
+   GAME AREA (GLASSMORPHISM CARD)
+   =================================== */
+
+.game-area {
+    background: var(--surface);
+    border-radius: var(--radius-card);
+    padding: var(--space-xlarge);
+    box-shadow: var(--shadow-level-2);
+    position: relative;
+    overflow: hidden;
+    animation: slideUp 0.4s var(--timing-easing);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(var(--space-medium));
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===================================
+   ANIMAL CONTAINER
+   =================================== */
+
+.animal-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.animal-svg {
+    width: 200px;
+    height: 200px;
+    animation: animalWiggle 3s ease-in-out infinite;
+}
+
+@keyframes animalWiggle {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+/* ===================================
+   WORD DISPLAY
+   =================================== */
+
+.word-display {
+    text-align: center;
+    font-size: var(--font-headline);
+    font-weight: var(--weight-bold);
+    line-height: var(--line-headline);
+    letter-spacing: 2px;
+    color: var(--text-primary);
+    margin-bottom: var(--space-large);
+    text-transform: uppercase;
+}
+
+/* ===================================
+   GAME ACTION BUTTONS (APPLE STYLE)
+   =================================== */
+
+.speak-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-small);
+    margin: var(--space-large) auto;
+    height: 64px;
+    padding: 0 var(--space-xlarge);
+    font-family: var(--font-apple);
+    font-size: 20px;
+    font-weight: var(--weight-semibold);
+    background: var(--ios-blue);
+    color: var(--surface);
+    border: none;
+    border-radius: var(--radius-large);
+    cursor: pointer;
+    box-shadow: var(--shadow-level-2);
+    transition: all var(--timing-base) var(--timing-easing);
+    min-width: 240px;
+    white-space: nowrap;
+}
+
+.speak-button svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2.5;
+    flex-shrink: 0;
+}
+
+.speak-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-level-3);
+}
+
+.speak-button:active {
+    transform: scale(0.98);
+    transition-duration: var(--timing-micro);
+}
+
+.check-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-small);
+    margin: var(--space-large) auto;
+    height: 64px;
+    padding: 0 var(--space-xlarge);
+    font-family: var(--font-apple);
+    font-size: 20px;
+    font-weight: var(--weight-semibold);
+    background: var(--ios-green);
+    color: var(--surface);
+    border: none;
+    border-radius: var(--radius-large);
+    cursor: pointer;
+    box-shadow: var(--shadow-level-2);
+    transition: all var(--timing-base) var(--timing-easing);
+    min-width: 240px;
+    white-space: nowrap;
+}
+
+.check-button svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 3;
+    flex-shrink: 0;
+}
+
+.check-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-level-3);
+}
+
+.check-button:active {
+    transform: scale(0.98);
+    transition-duration: var(--timing-micro);
+}
+
+.next-button {
+    background: var(--ios-blue);
+}
+
+/* ===================================
+   TRACING AREA AND CANVAS
+   =================================== */
+
+.tracing-area {
+    position: relative;
+    background: rgba(255, 240, 245, 0.6);
+    border-radius: 20px;
+    padding: 30px;
+    margin: 30px 0;
+    border: 3px dashed #ffd1dc;
+    min-height: 150px;
+}
+
+.tracing-canvas {
+    display: block;
+    margin: 0 auto;
+    border-radius: 15px;
+    background: white;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.clear-trace-button {
+    display: block;
+    margin: var(--space-medium) auto;
+    padding: var(--space-small) var(--space-medium);
+    height: 44px;
+    font-family: var(--font-apple);
+    font-size: var(--font-body);
+    font-weight: var(--weight-semibold);
+    background: var(--ios-orange);
+    color: var(--surface);
+    border: none;
+    border-radius: var(--radius-button);
+    cursor: pointer;
+    box-shadow: var(--shadow-level-1);
+    transition: all var(--timing-base) var(--timing-easing);
+}
+
+.clear-trace-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-level-2);
+    background: #E67D00;
+}
+
+.clear-trace-button:active {
+    transform: scale(0.98);
+    transition-duration: var(--timing-fast);
+}
+
+/* ===================================
+   LETTER BOXES
+   =================================== */
+
+.letter-boxes {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: var(--space-5) 0;
+    flex-wrap: wrap;
+}
+
+.letter-box {
+    width: 56px;
+    height: 68px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-apple);
+    font-size: 32px;
+    font-weight: var(--weight-semibold);
+    color: var(--text-secondary);
+    background: var(--surface);
+    text-transform: uppercase;
+    box-shadow: var(--shadow-level-1);
+    transition: all var(--timing-base) var(--timing-easing);
+}
+
+.letter-box:not(:empty) {
+    border-color: var(--ios-blue);
+    color: var(--ios-blue);
+    box-shadow: var(--shadow-level-2);
+    animation: letterPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes letterPop {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ===================================
+   SPELLING INPUT & INPUT AREA
+   =================================== */
+
+.input-area {
+    text-align: center;
+    margin-top: var(--space-6);
+}
+
+.input-heading {
+    font-size: var(--font-body);
+    font-weight: var(--weight-semibold);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.spelling-input {
+    font-family: var(--font-apple);
+    font-size: 32px;
+    font-weight: var(--weight-semibold);
+    padding: var(--space-medium);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-large);
+    text-align: center;
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    color: var(--text-primary);
+    transition: all var(--timing-base) var(--timing-easing);
+    box-shadow: var(--shadow-level-1);
+}
+
+.spelling-input:focus {
+    outline: none;
+    border-color: var(--ios-blue);
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1),
+                var(--shadow-level-2);
+}
+
+/* ===================================
+   ON-SCREEN KEYBOARD
+   =================================== */
+
+.on-screen-keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: var(--space-6) auto;
+    max-width: 800px;
+    padding: var(--space-5);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+/* Letter keyboard (tactile buttons) */
+.key-button {
+    position: relative;
+    min-width: 60px;
+    min-height: 60px;
+    font-family: var(--font-apple);
+    font-size: 22px;
+    font-weight: var(--weight-medium);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-small);
+    background: var(--surface);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--timing-fast) var(--timing-easing);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    box-shadow: var(--shadow-level-1);
+}
+
+.key-button:hover {
+    background: rgba(0, 122, 255, 0.05);
+    border-color: var(--ios-blue);
+}
+
+.key-button:active,
+.key-button.pressed {
+    transform: scale(0.95);
+    background: rgba(0, 122, 255, 0.1);
+    transition-duration: var(--timing-micro);
+}
+
+.key-button.backspace {
+    background: var(--ios-orange);
+    color: var(--surface);
+    border: none;
+    min-width: 96px;
+}
+
+.key-button.backspace:hover {
+    opacity: 0.9;
+}
+
+.key-button.backspace:active {
+    transform: scale(0.95);
+}
+
+@keyframes keyPress {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.key-button.pressed {
+    animation: keyPress 0.3s ease;
+}
+
+/* ===================================
+   FLOWER GARDEN (PROGRESS VISUALIZATION)
+   =================================== */
+
+.flower-garden {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-2);
+    background: linear-gradient(to top,
+        rgba(152, 229, 213, 0.15),
+        transparent
+    );
+    pointer-events: none;
+    z-index: 100;
+}
+
+.flower {
+    width: 48px;
+    height: 72px;
+    opacity: 0;
+    transform: scale(0) translateY(20px);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.flower.bloomed {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .flower.bloomed {
+        animation: flowerSway 4s ease-in-out infinite;
+    }
+}
+
+@keyframes flowerSway {
+    0%, 100% {
+        transform: scale(1) translateY(0) rotate(-3deg);
+    }
+    50% {
+        transform: scale(1.02) translateY(-4px) rotate(3deg);
+    }
+}
+
+/* ===================================
+   CELEBRATION EFFECTS
+   =================================== */
+
+.celebration {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 150;
+    font-size: 4rem;
+}
+
+.celebration.show {
+    animation: celebrationPop 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes celebrationPop {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.3) rotate(10deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+}
+
+/* Encouragement messages */
+.encouragement {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    padding: var(--space-6) var(--space-8);
+    border-radius: var(--radius-2xl);
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    box-shadow: var(--shadow-2xl),
+                0 0 0 1px rgba(255, 255, 255, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 150;
+    text-align: center;
+}
+
+.encouragement::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: inherit;
+    z-index: -1;
+}
+
+.encouragement.show {
+    animation: encouragementSlide 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes encouragementSlide {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-60px) scale(0.9);
+    }
+    15%, 85% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-60px) scale(0.9);
+    }
+}
+
+.progress-info {
+    text-align: center;
+    color: #666;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+/* ===================================
+   ACTION MODE STYLES
+   =================================== */
+
+.action-instruction {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #cc8800;
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(255, 235, 153, 0.3);
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+.action-demo {
+    text-align: center;
+    font-size: 5rem;
+    margin: 30px 0;
+    animation: actionPulse 2s ease-in-out infinite;
+}
+
+@keyframes actionPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes spinAnimation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(1080deg); }
+}
+
+.spinning {
+    animation: spinAnimation 3s ease-in-out;
+}
+
+/* ===================================
+   PARTICLES
+   =================================== */
+
+.particle {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0);
+        opacity: 0;
+    }
+}
+
+/* ===================================
+   GAME-SPECIFIC RESPONSIVE DESIGN
+   =================================== */
+
+/* Mobile - 481px to 768px */
+@media (max-width: 768px) {
+    .animal-svg {
+        width: 150px;
+        height: 150px;
+    }
+
+    .word-display {
+        font-size: clamp(1.75rem, 6vw, 2.5rem);
+    }
+
+    .game-area {
+        padding: var(--space-5);
+        border-radius: var(--radius-xl);
+    }
+
+    .spelling-input {
+        font-size: 1.5rem;
+        padding: var(--space-3);
+    }
+
+    .speak-button, .check-button {
+        font-size: 1.25rem;
+        padding: var(--space-3) var(--space-6);
+    }
+
+    .letter-box {
+        width: 48px;
+        height: 56px;
+        font-size: 1.75rem;
+    }
+
+    .celebration {
+        font-size: 3rem;
+    }
+
+    .flower-garden {
+        height: 100px;
+    }
+
+    .flower {
+        width: 40px;
+        height: 60px;
+    }
+
+    .key-button {
+        min-width: 45px;
+        min-height: 45px;
+        font-size: 1.5rem;
+    }
+
+    .keyboard-row {
+        gap: 5px;
+    }
+}
+
+/* Small mobile (iPhone SE, etc.) - 320px to 480px */
+@media (max-width: 480px) {
+    .game-area {
+        padding: var(--space-4);
+        margin-top: var(--space-4);
+    }
+
+    .speak-button, .check-button {
+        font-size: 1.125rem;
+        padding: var(--space-3) var(--space-5);
+    }
+
+    .key-button {
+        min-width: 42px;
+        min-height: 42px;
+        font-size: 1.25rem;
+    }
+
+    .spelling-input {
+        font-size: 1.25rem;
+        padding: var(--space-2);
+    }
+
+    .letter-box {
+        width: 40px;
+        height: 48px;
+        font-size: 1.5rem;
+    }
+
+    .encouragement {
+        font-size: 1.125rem;
+        padding: var(--space-3) var(--space-4);
+    }
+
+    .celebration {
+        font-size: 2.5rem;
+    }
+
+    .on-screen-keyboard {
+        padding: var(--space-3);
+        gap: var(--space-1);
+    }
+
+    .keyboard-row {
+        gap: var(--space-1);
+    }
+}

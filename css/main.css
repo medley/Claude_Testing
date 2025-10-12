@@ -1,0 +1,848 @@
+/* ===== MAIN STYLES =====
+ * Core application styles including:
+ * - CSS Variables (Design tokens)
+ * - Reset and base styles
+ * - Layout system
+ * - Glassmorphism cards
+ * - Header
+ * - Mode selector and buttons
+ * - Navigation buttons
+ * - Modal system
+ * - Authentication screen
+ * - Focus states and accessibility
+ * - Responsive design
+ */
+
+/* ===================================
+   CSS VARIABLES - APPLE-INSPIRED DESIGN SYSTEM
+   =================================== */
+
+:root {
+    /* ===== Apple iOS Color System ===== */
+    --ios-blue: #007AFF;
+    --ios-green: #34C759;
+    --ios-orange: #FF9500;
+    --ios-red: #FF3B30;
+
+    /* ===== Background & Surface ===== */
+    --background: #F2F2F7;
+    --surface: #FFFFFF;
+
+    /* ===== Text Colors (with opacity) ===== */
+    --text-primary: rgba(0, 0, 0, 0.87);
+    --text-secondary: rgba(60, 60, 67, 0.6);
+    --text-tertiary: rgba(60, 60, 67, 0.3);
+
+    /* ===== 8pt Spacing Grid (Apple Standard) ===== */
+    --space-micro: 4px;
+    --space-small: 8px;
+    --space-medium: 16px;
+    --space-large: 24px;
+    --space-xlarge: 32px;
+    --space-xxlarge: 48px;
+
+    /* ===== Border Radius (Apple Standard) ===== */
+    --radius-small: 8px;
+    --radius-medium: 12px;
+    --radius-large: 16px;
+    --radius-xlarge: 20px;
+    --radius-button: 16px;
+
+    /* ===== Apple-style Subtle Shadows ===== */
+    --shadow-level-1: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-level-2: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-level-3: 0 4px 16px rgba(0, 0, 0, 0.1);
+    --shadow-level-4: 0 8px 32px rgba(0, 0, 0, 0.12);
+
+    /* ===== Typography (SF Pro Display) ===== */
+    --font-apple: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+
+    /* Typography Scale */
+    --font-display: 40px;
+    --font-title: 28px;
+    --font-headline: 48px;
+    --font-body: 17px;
+    --font-caption: 13px;
+    --font-button: 20px;
+
+    /* Line Heights */
+    --line-display: 1.1;
+    --line-title: 1.2;
+    --line-headline: 1.1;
+    --line-body: 1.5;
+    --line-caption: 1.3;
+
+    /* Font Weights */
+    --weight-regular: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+
+    /* ===== Apple Standard Timing ===== */
+    --timing-micro: 100ms;
+    --timing-fast: 150ms;
+    --timing-base: 200ms;
+    --timing-transition: 300ms;
+    --timing-celebration: 600ms;
+    --timing-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===================================
+   RESET AND BASE STYLES
+   =================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+body {
+    font-family: var(--font-apple);
+    font-size: var(--font-body);
+    font-weight: var(--weight-regular);
+    line-height: var(--line-body);
+    color: var(--text-primary);
+    background: var(--background);
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* ===================================
+   LAYOUT SYSTEM
+   =================================== */
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--space-large);
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 var(--space-medium);
+    }
+}
+
+/* ===================================
+   GLASSMORPHISM CARD SYSTEM
+   =================================== */
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: var(--shadow-lg),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    padding: var(--space-6);
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.8) 50%,
+        transparent
+    );
+}
+
+/* ===================================
+   HEADER
+   =================================== */
+
+.header {
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+.header h1 {
+    font-size: var(--font-display);
+    font-weight: var(--weight-bold);
+    line-height: var(--line-display);
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+    margin-bottom: var(--space-small);
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 32px;
+    }
+}
+
+/* ===================================
+   MODE SELECTOR
+   =================================== */
+
+.mode-selector {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-medium);
+    max-width: 400px;
+    margin: var(--space-xxlarge) auto;
+    padding: 0;
+}
+
+/* ===================================
+   APPLE BUTTON ARCHITECTURE
+   =================================== */
+
+.mode-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    width: 100%;
+    height: 72px;
+    padding: 20px 24px;
+    font-family: var(--font-apple);
+    font-size: var(--font-button);
+    font-weight: var(--weight-semibold);
+    line-height: 1;
+    border: none;
+    border-radius: var(--radius-button);
+    cursor: pointer;
+    transition: all var(--timing-base) var(--timing-easing);
+    box-shadow: var(--shadow-level-2);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+}
+
+.mode-button svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 2.5;
+    flex-shrink: 0;
+}
+
+.mode-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.mode-button:active {
+    transform: scale(0.98);
+    transition-duration: var(--timing-micro);
+}
+
+/* Learn New Words - iOS Blue (Primary) */
+.mode-button.study {
+    background: var(--ios-blue);
+    color: var(--surface);
+}
+
+.mode-button.study svg {
+    color: var(--surface);
+}
+
+.mode-button.study.active,
+.mode-button.study:hover {
+    background: var(--ios-blue);
+    opacity: 0.9;
+}
+
+/* Spelling Test - iOS Blue (Secondary treatment) */
+.mode-button.test {
+    background: var(--surface);
+    color: var(--ios-blue);
+    border: 2px solid rgba(0, 122, 255, 0.2);
+}
+
+.mode-button.test svg {
+    color: var(--ios-blue);
+}
+
+.mode-button.test.active,
+.mode-button.test:hover {
+    background: rgba(0, 122, 255, 0.05);
+}
+
+/* Move & Spell - iOS Orange */
+.mode-button.action {
+    background: var(--ios-orange);
+    color: var(--surface);
+}
+
+.mode-button.action svg {
+    color: var(--surface);
+}
+
+.mode-button.action.active,
+.mode-button.action:hover {
+    background: var(--ios-orange);
+    opacity: 0.9;
+}
+
+/* Quick Words - iOS Green */
+.mode-button.sight {
+    background: var(--ios-green);
+    color: var(--surface);
+}
+
+.mode-button.sight svg {
+    color: var(--surface);
+}
+
+.mode-button.sight.active,
+.mode-button.sight:hover {
+    background: var(--ios-green);
+    opacity: 0.9;
+}
+
+/* ===================================
+   NAVIGATION BAR (APPLE STYLE)
+   =================================== */
+
+.progress-button {
+    position: fixed;
+    top: var(--space-medium);
+    right: var(--space-medium);
+    height: 48px;
+    background: var(--surface);
+    border: none;
+    border-radius: var(--radius-medium);
+    padding: 0 var(--space-medium);
+    font-family: var(--font-apple);
+    font-size: var(--font-body);
+    font-weight: var(--weight-medium);
+    color: var(--ios-blue);
+    cursor: pointer;
+    z-index: 1000;
+    transition: all var(--timing-base) var(--timing-easing);
+    box-shadow: var(--shadow-level-1);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-small);
+}
+
+.progress-button svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
+}
+
+.progress-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-level-2);
+}
+
+.progress-button:active {
+    transform: scale(0.98);
+    transition-duration: var(--timing-micro);
+}
+
+.home-button {
+    position: fixed;
+    top: var(--space-medium);
+    left: var(--space-medium);
+    height: 48px;
+    background: var(--surface);
+    border: none;
+    border-radius: var(--radius-medium);
+    padding: 0 var(--space-medium);
+    font-family: var(--font-apple);
+    font-size: var(--font-body);
+    font-weight: var(--weight-medium);
+    color: var(--ios-blue);
+    text-decoration: none;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all var(--timing-base) var(--timing-easing);
+    box-shadow: var(--shadow-level-1);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-small);
+}
+
+.home-button svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
+}
+
+.home-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-level-2);
+}
+
+.home-button:active {
+    transform: scale(0.98);
+    transition-duration: var(--timing-micro);
+}
+
+/* ===================================
+   MODAL SYSTEM (SETTINGS & PROGRESS)
+   =================================== */
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--surface);
+    padding: var(--space-xlarge);
+    border-radius: var(--radius-card);
+    max-width: 540px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-level-4);
+    animation: modalSlideIn 0.4s var(--timing-easing);
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(var(--space-large));
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-content h2 {
+    font-family: var(--font-apple);
+    font-size: var(--font-title);
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-large);
+    text-align: center;
+    letter-spacing: -0.02em;
+}
+
+.word-input-group {
+    margin-bottom: 15px;
+}
+
+.word-input-group label {
+    display: block;
+    color: #666;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.word-input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ffd1dc;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-family: inherit;
+}
+
+.save-button, .close-button {
+    height: 48px;
+    padding: 0 var(--space-large);
+    font-family: var(--font-apple);
+    font-size: var(--font-button);
+    font-weight: var(--weight-semibold);
+    border: none;
+    border-radius: var(--radius-button);
+    cursor: pointer;
+    margin: var(--space-small);
+    transition: all var(--timing-base) var(--timing-easing);
+}
+
+.save-button {
+    background: var(--ios-blue);
+    color: var(--surface);
+    box-shadow: var(--shadow-level-1);
+}
+
+.save-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-level-2);
+    background: #0051D5;
+}
+
+.save-button:active {
+    transform: scale(0.98);
+    transition-duration: var(--timing-fast);
+}
+
+.close-button {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-level-1);
+}
+
+.close-button:hover {
+    background: rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-level-2);
+}
+
+.close-button:active {
+    transform: scale(0.98);
+    transition-duration: var(--timing-fast);
+}
+
+/* ===================================
+   AUTH SCREEN (FLOATING CARD DESIGN)
+   =================================== */
+
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: var(--space-medium);
+}
+
+.auth-box {
+    background: var(--surface);
+    padding: var(--space-xxlarge);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-level-3);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    animation: floatIn 0.4s var(--timing-easing) forwards;
+}
+
+@keyframes floatIn {
+    from {
+        opacity: 0;
+        transform: translateY(var(--space-medium));
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-box h1 {
+    font-family: var(--font-apple);
+    font-size: var(--font-display);
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-small);
+    letter-spacing: -0.02em;
+}
+
+.auth-box p {
+    font-family: var(--font-apple);
+    font-size: var(--font-body);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xlarge);
+    line-height: 1.47;
+}
+
+.auth-input {
+    width: 100%;
+    height: 48px;
+    padding: 0 var(--space-medium);
+    margin-bottom: var(--space-medium);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-input);
+    font-family: var(--font-apple);
+    font-size: var(--font-body);
+    color: var(--text-primary);
+    box-sizing: border-box;
+    transition: all var(--timing-base) var(--timing-easing);
+    background: var(--surface);
+    -webkit-appearance: none;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: var(--ios-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+}
+
+.auth-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.auth-button {
+    width: 100%;
+    height: 48px;
+    margin-bottom: var(--space-medium);
+    border: none;
+    border-radius: var(--radius-button);
+    font-family: var(--font-apple);
+    font-size: var(--font-button);
+    font-weight: var(--weight-semibold);
+    cursor: pointer;
+    transition: all var(--timing-base) var(--timing-easing);
+    position: relative;
+}
+
+.auth-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-level-2);
+}
+
+.auth-button:active {
+    transform: scale(0.98);
+    transition-duration: var(--timing-fast);
+}
+
+.auth-button.primary {
+    background: var(--ios-blue);
+    color: var(--surface);
+    box-shadow: var(--shadow-level-1);
+}
+
+.auth-button.primary:hover {
+    background: #0051D5;
+}
+
+.auth-button.secondary {
+    background: var(--ios-green);
+    color: var(--surface);
+    box-shadow: var(--shadow-level-1);
+}
+
+.auth-button.secondary:hover {
+    background: #28A745;
+}
+
+.auth-link {
+    font-family: var(--font-apple);
+    font-size: var(--font-body);
+    color: var(--ios-blue);
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: var(--space-medium);
+    display: inline-block;
+    transition: opacity var(--timing-base) var(--timing-easing);
+}
+
+.auth-link:hover {
+    opacity: 0.7;
+}
+
+/* ===================================
+   FOCUS STATES (KEYBOARD NAVIGATION ACCESSIBILITY)
+   =================================== */
+
+button:focus-visible,
+input:focus-visible,
+.mode-button:focus-visible,
+.key-button:focus-visible,
+.speak-button:focus-visible,
+.check-button:focus-visible,
+.clear-trace-button:focus-visible,
+.save-button:focus-visible,
+.close-button:focus-visible,
+.settings-button:focus-visible,
+.progress-button:focus-visible,
+.home-button:focus-visible {
+    outline: 3px solid var(--ios-blue);
+    outline-offset: 3px;
+}
+
+.auth-input:focus-visible {
+    outline: none;
+}
+
+.spelling-input:focus-visible {
+    outline: none;
+}
+
+/* iPad Safari touch fixes */
+button, .mode-button, .speak-button, .check-button, .clear-trace-button,
+.save-button, .close-button, .settings-button, .progress-button, .home-button, .key-button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* ===================================
+   RESPONSIVE DESIGN - TABLET & MOBILE
+   =================================== */
+
+/* Tablet - 769px to 1024px */
+@media (max-width: 1024px) {
+    .modal-content {
+        max-width: 90%;
+    }
+
+    .encouragement {
+        font-size: 1.25rem;
+        padding: var(--space-5) var(--space-7);
+    }
+}
+
+/* Mobile - 481px to 768px */
+@media (max-width: 768px) {
+    :root {
+        --space-8: 32px;
+    }
+
+    /* Header spacing and title size */
+    .header {
+        margin-bottom: var(--space-8);
+        margin-top: var(--space-4);
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    /* Stack mode buttons vertically on mobile */
+    .mode-selector {
+        flex-direction: column;
+        gap: var(--space-3);
+        padding: var(--space-3);
+        margin-bottom: var(--space-8);
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .mode-button {
+        width: 100%;
+        min-width: auto;
+        font-size: 1rem;
+        padding: var(--space-3) var(--space-4);
+    }
+
+    /* Smaller fixed buttons on mobile */
+    .settings-button, .progress-button {
+        width: 48px;
+        height: 48px;
+        font-size: 1.4rem;
+        top: var(--space-2);
+    }
+
+    .progress-button {
+        right: calc(48px + var(--space-2) + var(--space-2));
+    }
+
+    .home-button {
+        font-size: 1rem;
+        padding: var(--space-2) var(--space-3);
+        top: var(--space-2);
+    }
+
+    .auth-box {
+        padding: var(--space-6);
+    }
+
+    .modal-content {
+        padding: var(--space-6);
+    }
+}
+
+/* Small mobile (iPhone SE, etc.) - 320px to 480px */
+@media (max-width: 480px) {
+    /* Title size reduced to 32px on small screens */
+    .header {
+        margin-top: var(--space-5);
+        margin-bottom: var(--space-6);
+    }
+
+    .header h1 {
+        font-size: 2rem; /* 32px */
+    }
+
+    /* More breathing room for stacked mode buttons */
+    .mode-selector {
+        gap: var(--space-2);
+        padding: var(--space-2);
+        margin-bottom: var(--space-6);
+        max-width: 280px;
+    }
+
+    .mode-button {
+        font-size: 0.9375rem;
+        padding: var(--space-2) var(--space-3);
+    }
+
+    /* Smaller fixed buttons on small mobile */
+    .settings-button, .progress-button {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+        top: var(--space-1);
+        right: var(--space-1);
+    }
+
+    .progress-button {
+        right: calc(40px + var(--space-1) + var(--space-2));
+    }
+
+    .home-button {
+        font-size: 0.9375rem;
+        padding: var(--space-1) var(--space-2);
+        top: var(--space-1);
+        left: var(--space-1);
+    }
+}
+
+/* Extra small screens (320px) */
+@media (max-width: 360px) {
+    .header h1 {
+        font-size: 1.75rem; /* 28px for very small screens */
+    }
+
+    .mode-selector {
+        max-width: 260px;
+    }
+
+    .settings-button, .progress-button {
+        width: 36px;
+        height: 36px;
+        font-size: 1.125rem;
+    }
+
+    .progress-button {
+        right: calc(36px + var(--space-1) + var(--space-2));
+    }
+
+    .home-button {
+        font-size: 0.875rem;
+    }
+}
