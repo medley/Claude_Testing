@@ -68,16 +68,30 @@
                     <i data-lucide="activity"></i>
                     Move & Spell
                 </button>
-                <button class="mode-button sight" onclick="setMode('sight')">
-                    <i data-lucide="zap"></i>
-                    Quick Words
-                </button>
             </div>
 
             <!-- Game Area -->
             <div class="game-area">
                 <div class="progress-info" id="progressInfo"></div>
-                
+
+                <!-- Step Indicator (for Learn Mode) -->
+                <div class="step-indicator" id="stepIndicator" style="display: none;">
+                    <div class="step" data-step="listen">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">Listen</div>
+                    </div>
+                    <div class="step-arrow">→</div>
+                    <div class="step" data-step="trace">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Trace</div>
+                    </div>
+                    <div class="step-arrow">→</div>
+                    <div class="step" data-step="type">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Type</div>
+                    </div>
+                </div>
+
                 <!-- Animal Display -->
                 <div class="animal-container" id="animalContainer">
                     <svg class="animal-svg" id="animalSVG" viewBox="0 0 200 200"></svg>
@@ -86,11 +100,28 @@
                 <!-- Word Display -->
                 <div class="word-display" id="wordDisplay">Ready to learn!</div>
                 
+                <!-- Contextual Instruction (for Learn Mode) -->
+                <div class="contextual-instruction" id="contextualInstruction" style="display: none;">
+                    <p id="instructionText">Listen carefully to the word!</p>
+                </div>
+
                 <!-- Speak Button -->
                 <button class="speak-button" onclick="speakWord()">
                     <i data-lucide="volume-2"></i>
                     <span>Hear the Word</span>
                 </button>
+
+                <!-- Step Control Buttons (for Learn Mode) -->
+                <div class="step-controls" id="stepControls" style="display: none;">
+                    <button class="step-button primary" id="primaryStepButton" onclick="advanceStep()">
+                        <span>Ready to Trace!</span>
+                        <i data-lucide="arrow-right"></i>
+                    </button>
+                    <button class="step-button secondary" id="skipButton" onclick="skipToType()" style="display: none;">
+                        <span>I know this word!</span>
+                        <i data-lucide="zap"></i>
+                    </button>
+                </div>
 
                 <!-- Action Mode Elements -->
                 <div class="action-instruction" id="actionInstruction" style="display: none;"></div>

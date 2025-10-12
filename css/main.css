@@ -300,21 +300,7 @@ body {
     opacity: 0.9;
 }
 
-/* Quick Words - iOS Green */
-.mode-button.sight {
-    background: var(--ios-green);
-    color: var(--surface);
-}
-
-.mode-button.sight svg {
-    color: var(--surface);
-}
-
-.mode-button.sight.active,
-.mode-button.sight:hover {
-    background: var(--ios-green);
-    opacity: 0.9;
-}
+/* Removed: Quick Words mode button styles (no longer needed) */
 
 /* ===================================
    NAVIGATION BAR (APPLE STYLE)

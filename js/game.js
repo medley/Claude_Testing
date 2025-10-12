@@ -785,11 +785,16 @@ const flowerTemplates = [
 // GAME STATE VARIABLES
 // ============================================================================
 
-let currentMode = 'study'; // 'study', 'test', 'action', or 'sight'
+let currentMode = 'study'; // 'study', 'test', or 'action'
 let currentWordIndex = 0;
 let masteredWords = 0;
 let currentWord = '';
 let wordOrder = []; // For randomization
+
+// Learn Mode Step State ('listen', 'trace', 'type', 'celebrate')
+let currentStep = 'listen';
+let hasListened = false;
+let hasTraced = false;
 
 // ============================================================================
 // ACTION CUES AND WORD DATA
@@ -862,8 +867,7 @@ const actionCues = {
     }
 };
 
-// Sight Words (common first grade sight words)
-const sightWords = ['the', 'and', 'a', 'to', 'said', 'in', 'he', 'I', 'of', 'it', 'was', 'you', 'they', 'on', 'she', 'is', 'for', 'at', 'his', 'but'];
+// Removed: Sight Words mode no longer needed
 
 // Animal actions paired with specific words
 const animalActions = {
@@ -1119,7 +1123,7 @@ async function init() {
 // ============================================================================
 
 /**
- * Sets the game mode (study, test, action, or sight)
+ * Sets the game mode (study, test, or action)
  */
 function setMode(mode) {
     currentMode = mode;
@@ -1132,23 +1136,135 @@ function setMode(mode) {
 
     if (mode === 'study') {
         document.querySelector('.mode-button.study').classList.add('active');
-        // Randomize word order for study mode
         wordOrder = shuffleArray(weeklyWords);
     } else if (mode === 'test') {
         document.querySelector('.mode-button.test').classList.add('active');
-        // Randomize word order for test mode
         wordOrder = shuffleArray(weeklyWords);
     } else if (mode === 'action') {
         document.querySelector('.mode-button.action').classList.add('active');
-        // Randomize word order for action mode
         wordOrder = shuffleArray(weeklyWords);
-    } else {
-        document.querySelector('.mode-button.sight').classList.add('active');
-        wordOrder = [...sightWords]; // Sight words don't need shuffling
     }
 
     resetFlowerGarden();
     startNewWord();
+}
+
+// ============================================================================
+// LEARN MODE STEP MANAGEMENT
+// ============================================================================
+
+/**
+ * Updates the step indicator visual state
+ */
+function updateStepIndicator() {
+    const steps = document.querySelectorAll('.step');
+    steps.forEach(step => {
+        const stepName = step.getAttribute('data-step');
+        step.classList.remove('active', 'completed');
+
+        if (stepName === currentStep) {
+            step.classList.add('active');
+        } else if (
+            (stepName === 'listen' && hasListened) ||
+            (stepName === 'trace' && hasTraced && currentStep === 'type')
+        ) {
+            step.classList.add('completed');
+        }
+    });
+}
+
+/**
+ * Sets the current learning step and updates UI
+ */
+function setStep(step) {
+    currentStep = step;
+    const stepIndicator = document.getElementById('stepIndicator');
+    const contextualInstruction = document.getElementById('contextualInstruction');
+    const instructionText = document.getElementById('instructionText');
+    const stepControls = document.getElementById('stepControls');
+    const primaryButton = document.getElementById('primaryStepButton');
+    const skipButton = document.getElementById('skipButton');
+    const tracingArea = document.getElementById('tracingArea');
+    const inputArea = document.querySelector('.input-area');
+    const checkButton = document.getElementById('checkButton');
+    const speakButton = document.querySelector('.speak-button');
+
+    // Update step indicator
+    updateStepIndicator();
+
+    if (step === 'listen') {
+        // STEP 1: LISTEN
+        instructionText.textContent = '🎧 Listen carefully to the word!';
+        contextualInstruction.style.display = 'block';
+        stepControls.style.display = 'none';
+        tracingArea.style.display = 'none';
+        inputArea.style.display = 'none';
+        checkButton.style.display = 'none';
+        speakButton.style.display = 'flex';
+
+        // Auto-speak word, then auto-advance after 2 seconds
+        setTimeout(() => {
+            speakWord().then(() => {
+                hasListened = true;
+                setTimeout(() => {
+                    setStep('trace');
+                }, 2000);
+            });
+        }, 500);
+
+    } else if (step === 'trace') {
+        // STEP 2: TRACE
+        instructionText.textContent = '✏️ Now trace each letter with your finger!';
+        contextualInstruction.style.display = 'block';
+        stepControls.style.display = 'flex';
+        primaryButton.innerHTML = '<span>Done Tracing!</span><i data-lucide="arrow-right"></i>';
+        skipButton.style.display = hasListened ? 'flex' : 'none';
+        tracingArea.style.display = 'block';
+        inputArea.style.display = 'none';
+        checkButton.style.display = 'none';
+        speakButton.style.display = 'flex';
+
+        // Re-initialize Lucide icons for the new button content
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    } else if (step === 'type') {
+        // STEP 3: TYPE
+        instructionText.textContent = '⌨️ Great! Now type the word!';
+        contextualInstruction.style.display = 'block';
+        stepControls.style.display = 'none';
+        tracingArea.style.display = 'none';
+        inputArea.style.display = 'block';
+        checkButton.style.display = 'flex';
+        checkButton.textContent = '✅ Check My Spelling!';
+        speakButton.style.display = 'flex';
+
+        // Focus on input
+        setTimeout(() => {
+            document.getElementById('spellingInput').focus();
+        }, 300);
+    }
+}
+
+/**
+ * Advances to the next step in Learn Mode
+ */
+function advanceStep() {
+    createSparkles(document.getElementById('primaryStepButton'));
+
+    if (currentStep === 'listen') {
+        setStep('trace');
+    } else if (currentStep === 'trace') {
+        hasTraced = true;
+        setStep('type');
+    }
+}
+
+/**
+ * Skips directly to typing (for words the student knows well)
+ */
+function skipToType() {
+    createSparkles(document.getElementById('skipButton'));
+    setStep('type');
 }
 
 /**
@@ -1157,26 +1273,41 @@ function setMode(mode) {
 function startNewWord() {
     if (currentWordIndex >= wordOrder.length) {
         currentWordIndex = 0;
-        // Reshuffle for study/test modes when looping
+        // Reshuffle when looping
         if (currentMode === 'study' || currentMode === 'test' || currentMode === 'action') {
             wordOrder = shuffleArray(weeklyWords);
         }
     }
 
     currentWord = wordOrder[currentWordIndex];
+
+    // Reset step state for new word
+    currentStep = 'listen';
+    hasListened = false;
+    hasTraced = false;
+
     const wordDisplay = document.getElementById('wordDisplay');
     const actionInstruction = document.getElementById('actionInstruction');
     const actionDemo = document.getElementById('actionDemo');
     const tracingArea = document.getElementById('tracingArea');
     const inputArea = document.querySelector('.input-area');
     const checkButton = document.getElementById('checkButton');
+    const stepIndicator = document.getElementById('stepIndicator');
+    const contextualInstruction = document.getElementById('contextualInstruction');
+    const stepControls = document.getElementById('stepControls');
+    const speakButton = document.querySelector('.speak-button');
 
     // Reset displays
     actionInstruction.style.display = 'none';
     actionDemo.style.display = 'none';
+    document.getElementById('spellingInput').value = '';
 
     if (currentMode === 'action') {
-        // ACTION MODE
+        // === ACTION MODE ===
+        stepIndicator.style.display = 'none';
+        contextualInstruction.style.display = 'none';
+        stepControls.style.display = 'none';
+
         wordDisplay.textContent = currentWord.toUpperCase();
         wordDisplay.style.fontSize = '3rem';
 
@@ -1188,54 +1319,48 @@ function startNewWord() {
             actionDemo.style.display = 'block';
         }
 
-        // Hide input/tracing in action mode
         tracingArea.style.display = 'none';
         inputArea.style.display = 'none';
+        checkButton.style.display = 'flex';
         checkButton.textContent = '🎭 I Did the Action!';
         checkButton.onclick = actionComplete;
-        // Add touch event for iPad
-        checkButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            actionComplete();
-        }, { passive: false, once: true });
+        speakButton.style.display = 'flex';
         document.getElementById('letterBoxes').innerHTML = '';
 
-        // Speak the action cue
         setTimeout(() => speakActionCue(), 500);
-    } else {
-        // STUDY, TEST, or SIGHT modes
-        tracingArea.style.display = 'block';
+
+    } else if (currentMode === 'test') {
+        // === TEST MODE ===
+        stepIndicator.style.display = 'none';
+        contextualInstruction.style.display = 'none';
+        stepControls.style.display = 'none';
+
+        wordDisplay.textContent = '❓ Listen & Type ❓';
+        wordDisplay.style.fontSize = '2rem';
+
+        tracingArea.style.display = 'none';
         inputArea.style.display = 'block';
-
-        if (currentMode === 'test') {
-            wordDisplay.textContent = '❓ Listen & Type ❓';
-            wordDisplay.style.fontSize = '2rem';
-        } else {
-            wordDisplay.textContent = currentWord;
-            wordDisplay.style.fontSize = '3rem';
-        }
-
-        document.getElementById('spellingInput').value = '';
+        checkButton.style.display = 'flex';
         checkButton.textContent = '✅ Check My Spelling!';
         checkButton.onclick = checkSpelling;
-        // Add touch event for iPad
-        checkButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            checkSpelling();
-        }, { passive: false, once: true });
+        speakButton.style.display = 'flex';
 
-        // Create letter boxes (only in study mode and sight words mode)
-        if (currentMode === 'test') {
-            document.getElementById('letterBoxes').innerHTML = '';
-        } else {
-            createLetterBoxes(currentWord);
-        }
-
-        // Clear canvas
+        document.getElementById('letterBoxes').innerHTML = '';
         clearTracing();
 
-        // Speak word automatically
         setTimeout(() => speakWord(), 500);
+
+    } else {
+        // === LEARN MODE (STUDY) with STEP SYSTEM ===
+        stepIndicator.style.display = 'flex';
+        wordDisplay.textContent = currentWord;
+        wordDisplay.style.fontSize = '3rem';
+
+        createLetterBoxes(currentWord);
+        clearTracing();
+
+        // Start with Step 1: Listen
+        setStep('listen');
     }
 
     // Update progress
@@ -1302,7 +1427,14 @@ function checkSpelling() {
         // Correct!
         playSuccessSound();
         showCelebration();
-        showEncouragement('Perfect! You are amazing!');
+
+        // Different encouragement for Learn Mode vs Test Mode
+        if (currentMode === 'study') {
+            showEncouragement('🎉 Amazing! You mastered this word! 🌟');
+        } else {
+            showEncouragement('✨ Perfect! You are amazing! ✨');
+        }
+
         bloomFlower();
         masteredWords++;
 
@@ -1310,21 +1442,20 @@ function checkSpelling() {
         recordWordMastered(currentWord);
         recordWordAttempt();
 
-        // Change button to next
+        // Update button with early skip option
         const nextBtn = document.getElementById('checkButton');
         nextBtn.textContent = '➡️ Next Word!';
         nextBtn.classList.add('next-button');
         nextBtn.onclick = nextWord;
-        // Add touch event for iPad
-        nextBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            nextWord();
-        }, { passive: false, once: true });
 
-        // Auto-advance after 2 seconds
+        // Show button after 1.5s, auto-advance after 2.5s
+        setTimeout(() => {
+            nextBtn.style.display = 'flex';
+        }, 1500);
+
         setTimeout(() => {
             nextWord();
-        }, 2000);
+        }, 2500);
     } else {
         // Gentle try again
         playEncouragementSound();
@@ -1821,8 +1952,7 @@ function setupTouchEvents() {
         btn.addEventListener('touchstart', (e) => {
             e.preventDefault();
             const mode = btn.classList.contains('study') ? 'study' :
-                        btn.classList.contains('test') ? 'test' :
-                        btn.classList.contains('action') ? 'action' : 'sight';
+                        btn.classList.contains('test') ? 'test' : 'action';
             setMode(mode);
         }, { passive: false });
     });

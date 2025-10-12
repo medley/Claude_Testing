@@ -17,6 +17,185 @@
  */
 
 /* ===================================
+   STEP INDICATOR (LEARN MODE)
+   =================================== */
+
+.step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-medium);
+    margin: var(--space-large) 0;
+    padding: var(--space-medium);
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: var(--radius-large);
+    animation: slideDown 0.4s var(--timing-easing);
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-micro);
+}
+
+.step-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-apple);
+    font-size: 18px;
+    font-weight: var(--weight-bold);
+    background: var(--surface);
+    color: var(--text-secondary);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    transition: all var(--timing-base) var(--timing-easing);
+}
+
+.step-label {
+    font-family: var(--font-apple);
+    font-size: var(--font-caption);
+    font-weight: var(--weight-medium);
+    color: var(--text-secondary);
+    transition: all var(--timing-base) var(--timing-easing);
+}
+
+.step.active .step-circle {
+    background: var(--ios-blue);
+    color: var(--surface);
+    border-color: var(--ios-blue);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.step.active .step-label {
+    color: var(--ios-blue);
+    font-weight: var(--weight-semibold);
+}
+
+.step.completed .step-circle {
+    background: var(--ios-green);
+    color: var(--surface);
+    border-color: var(--ios-green);
+}
+
+.step.completed .step-circle::after {
+    content: '✓';
+    position: absolute;
+}
+
+.step.completed .step-label {
+    color: var(--ios-green);
+}
+
+.step-arrow {
+    font-size: 20px;
+    color: var(--text-tertiary);
+    font-weight: var(--weight-semibold);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===================================
+   CONTEXTUAL INSTRUCTION BANNER
+   =================================== */
+
+.contextual-instruction {
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(52, 199, 89, 0.1));
+    border-radius: var(--radius-large);
+    padding: var(--space-medium) var(--space-large);
+    margin: var(--space-medium) 0;
+    text-align: center;
+    border: 2px solid rgba(0, 122, 255, 0.2);
+    animation: slideDown 0.3s var(--timing-easing);
+}
+
+.contextual-instruction p {
+    font-family: var(--font-apple);
+    font-size: 18px;
+    font-weight: var(--weight-semibold);
+    color: var(--ios-blue);
+    margin: 0;
+}
+
+/* ===================================
+   STEP CONTROL BUTTONS
+   =================================== */
+
+.step-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-small);
+    margin: var(--space-large) auto;
+    max-width: 400px;
+    animation: fadeIn 0.3s var(--timing-easing);
+}
+
+.step-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-small);
+    height: 56px;
+    padding: 0 var(--space-large);
+    font-family: var(--font-apple);
+    font-size: 18px;
+    font-weight: var(--weight-semibold);
+    border: none;
+    border-radius: var(--radius-button);
+    cursor: pointer;
+    transition: all var(--timing-base) var(--timing-easing);
+    box-shadow: var(--shadow-level-2);
+}
+
+.step-button svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
+}
+
+.step-button.primary {
+    background: var(--ios-blue);
+    color: var(--surface);
+}
+
+.step-button.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.3);
+}
+
+.step-button.primary:active {
+    transform: scale(0.98);
+}
+
+.step-button.secondary {
+    background: var(--surface);
+    color: var(--ios-orange);
+    border: 2px solid rgba(255, 149, 0, 0.3);
+}
+
+.step-button.secondary:hover {
+    background: rgba(255, 149, 0, 0.1);
+    border-color: var(--ios-orange);
+}
+
+.step-button.secondary:active {
+    transform: scale(0.98);
+}
+
+/* ===================================
    SPARKLE ANIMATIONS
    =================================== */
 
@@ -201,6 +380,14 @@
     margin: 30px 0;
     border: 3px dashed #ffd1dc;
     min-height: 150px;
+    transition: all var(--timing-transition) var(--timing-easing);
+    opacity: 1;
+    transform: scale(1);
+}
+
+.tracing-area[style*="display: none"] {
+    opacity: 0;
+    transform: scale(0.95);
 }
 
 .tracing-canvas {
@@ -298,6 +485,14 @@
 .input-area {
     text-align: center;
     margin-top: var(--space-6);
+    transition: all var(--timing-transition) var(--timing-easing);
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.input-area[style*="display: none"] {
+    opacity: 0;
+    transform: translateY(20px);
 }
 
 .input-heading {
@@ -666,6 +861,35 @@
     .flower {
         width: 40px;
         height: 60px;
+    }
+
+    /* Step indicator adjustments */
+    .step-indicator {
+        gap: var(--space-small);
+        padding: var(--space-small);
+    }
+
+    .step-circle {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .step-label {
+        font-size: 11px;
+    }
+
+    .step-arrow {
+        font-size: 16px;
+    }
+
+    .contextual-instruction p {
+        font-size: 16px;
+    }
+
+    .step-button {
+        height: 52px;
+        font-size: 16px;
     }
 
     .key-button {
