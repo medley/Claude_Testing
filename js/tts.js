@@ -13,11 +13,14 @@ const GOOGLE_TTS_API_URL = 'https://texttospeech.googleapis.com/v1/text:synthesi
 const GOOGLE_VOICE_NAME = 'en-US-Neural2-C'; // Warm, natural-sounding female voice
 
 // ----------------------------------------------------------------------------
-// AUDIO CACHE
+// AUDIO CACHE AND PLAYBACK MANAGEMENT
 // ----------------------------------------------------------------------------
 
 // Audio cache to avoid repeated API calls
 const audioCache = new Map();
+
+// Currently playing audio element (for stopping when switching modes)
+let currentAudio = null;
 
 // ----------------------------------------------------------------------------
 // GOOGLE CLOUD TTS FUNCTION
@@ -104,16 +107,39 @@ function playAudioFromBase64(base64Audio) {
     return new Promise((resolve, reject) => {
         console.log('🔊 Playing audio...');
         const audio = new Audio('data:audio/mp3;base64,' + base64Audio);
+
+        // Track this as the current audio
+        currentAudio = audio;
+
         audio.onended = () => {
             console.log('✅ Audio playback finished');
+            if (currentAudio === audio) {
+                currentAudio = null;
+            }
             resolve();
         };
         audio.onerror = (err) => {
             console.error('❌ Audio playback error:', err);
+            if (currentAudio === audio) {
+                currentAudio = null;
+            }
             reject(err);
         };
         audio.play().catch(reject);
     });
+}
+
+/**
+ * Stops all currently playing audio
+ * Called when switching modes to prevent audio overlap
+ */
+function stopAllAudio() {
+    if (currentAudio) {
+        console.log('🛑 Stopping current audio playback');
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -157,6 +183,7 @@ function hideSpeechLoading() {
  * Speaks the current word using best practice spelling instruction:
  * letters → pause → word → pause → letters
  * Pattern: "t h e, the, t h e" (spell once, word once, spell once)
+ * Used for Learn Mode (study)
  */
 async function speakWord() {
     console.log('🎯 speakWord() called for word:', currentWord);
@@ -192,6 +219,23 @@ async function speakWord() {
 
     } catch (error) {
         console.error('❌ Error in speakWord:', error);
+    }
+}
+
+/**
+ * Speaks only the word (no spelling) - for Test Mode
+ * Pattern: just says the word once
+ */
+async function speakWordOnly() {
+    console.log('🎯 speakWordOnly() called for word:', currentWord);
+
+    createSparkles(document.querySelector('.speak-button'));
+
+    try {
+        // Just say the word once - no spelling
+        await speakWithGoogleTTS(currentWord, true);
+    } catch (error) {
+        console.error('❌ Error in speakWordOnly:', error);
     }
 }
 

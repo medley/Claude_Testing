@@ -1119,6 +1119,24 @@ async function init() {
 }
 
 // ============================================================================
+// AUDIO WRAPPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Smart speak function that calls the appropriate TTS based on mode
+ * - Test mode: speaks word only (no spelling)
+ * - Learn mode: speaks word with spelling
+ * - Action mode: handled separately via speakActionCue()
+ */
+function speakCurrentWord() {
+    if (currentMode === 'test') {
+        speakWordOnly();
+    } else {
+        speakWord();
+    }
+}
+
+// ============================================================================
 // MODE AND GAME FLOW FUNCTIONS
 // ============================================================================
 
@@ -1126,6 +1144,9 @@ async function init() {
  * Sets the game mode (study, test, or action)
  */
 function setMode(mode) {
+    // Stop any currently playing audio to prevent overlap
+    stopAllAudio();
+
     currentMode = mode;
     currentWordIndex = 0;
     masteredWords = 0;
@@ -1348,7 +1369,8 @@ function startNewWord() {
         document.getElementById('letterBoxes').innerHTML = '';
         clearTracing();
 
-        setTimeout(() => speakWord(), 500);
+        // Test mode: only say the word, don't spell it
+        setTimeout(() => speakWordOnly(), 500);
 
     } else {
         // === LEARN MODE (STUDY) with STEP SYSTEM ===
